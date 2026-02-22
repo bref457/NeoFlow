@@ -1,50 +1,12 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Lock, Rocket, Sparkles, Workflow, Zap } from "lucide-react";
-
-const features = [
-  {
-    title: "Secure Authentication",
-    description: "Built-in Supabase auth flows for login, signup, and protected routes.",
-    icon: Lock,
-  },
-  {
-    title: "Fast Note Workflow",
-    description: "Create and manage notes instantly with server actions and real-time UX.",
-    icon: Workflow,
-  },
-  {
-    title: "Production Foundation",
-    description: "Ready-to-extend architecture with clean components and typed data access.",
-    icon: Rocket,
-  },
-  {
-    title: "Modern UI System",
-    description: "Shadcn/ui components paired with Tailwind for consistent product design.",
-    icon: Sparkles,
-  },
-  {
-    title: "Performance First",
-    description: "Server rendering and lean interactions keep everything responsive.",
-    icon: Zap,
-  },
-  {
-    title: "Scalable Structure",
-    description: "Clear app layout and modular pages built for future SaaS features.",
-    icon: CheckCircle2,
-  },
-];
 
 export default async function Home() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const primaryHref = user ? "/dashboard" : "/signup";
-  const secondaryHref = user ? "/notes" : "/login";
 
   return (
     <div className="relative overflow-hidden">
@@ -53,69 +15,43 @@ export default async function Home() {
         <div className="absolute bottom-[-10rem] right-[-6rem] h-[20rem] w-[20rem] rounded-full bg-sky-300/20 blur-3xl" />
       </div>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 py-14 sm:px-6 sm:py-20">
-        <section className="space-y-7 text-center">
-          <p className="inline-flex rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-            Built for focused teams
+      <main className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-5xl flex-col items-center justify-center gap-8 px-4 py-14 text-center sm:px-6 sm:py-20">
+        <p className="inline-flex rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+          NeoFlow Productivity App
+        </p>
+
+        <div className="max-w-3xl space-y-4">
+          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+            Build your productivity flow with NeoFlow
+          </h1>
+          <p className="text-base text-muted-foreground sm:text-lg">
+            NeoFlow ist deine zentrale App für Projekte, Tasks, Notizen und Kalender.
+            Alles an einem Ort, klar strukturiert und einfach zu bedienen.
           </p>
-          <div className="mx-auto max-w-3xl space-y-4">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
-              Build your productivity flow with NeoFlow
-            </h1>
-            <p className="text-base text-muted-foreground sm:text-lg">
-              NeoFlow combines secure auth, fast project and notes workflows, and a polished UI
-              foundation so you can focus on outcomes instead of boilerplate.
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button asChild size="lg">
-              <Link href={primaryHref}>Get started</Link>
+        </div>
+
+        {!user ? (
+          <div className="flex w-full max-w-md flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
+            <Button asChild size="lg" className="w-full sm:w-auto">
+              <Link href="/signup">Sign up</Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href={secondaryHref}>Open App</Link>
+            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+              <Link href="/login">Sign in</Link>
             </Button>
           </div>
-        </section>
-
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <Card key={feature.title} className="border-border/70 bg-card/90 shadow-sm">
-                <CardHeader className="space-y-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <CardTitle>{feature.title}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            );
-          })}
-        </section>
-
-        <section className="rounded-2xl border bg-card/80 p-6 shadow-sm">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border bg-background/70 p-4">
-              <p className="text-sm font-medium">Auth-ready</p>
-              <p className="text-sm text-muted-foreground">Secure session flows from day one.</p>
-            </div>
-            <div className="rounded-lg border bg-background/70 p-4">
-              <p className="text-sm font-medium">Supabase-powered</p>
-              <p className="text-sm text-muted-foreground">Reliable backend with RLS support.</p>
-            </div>
-            <div className="rounded-lg border bg-background/70 p-4">
-              <p className="text-sm font-medium">Modern UI</p>
-              <p className="text-sm text-muted-foreground">Shadcn components and clean spacing.</p>
-            </div>
+        ) : (
+          <div className="flex w-full max-w-md justify-center">
+            <Button asChild size="lg" className="w-full sm:w-auto">
+              <Link href="/dashboard">Zum Dashboard</Link>
+            </Button>
           </div>
-        </section>
+        )}
       </main>
 
       <footer className="border-t">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 text-sm text-muted-foreground sm:px-6">
           <p>© {new Date().getFullYear()} NeoFlow</p>
-          <p>Simple, secure, and ready to scale.</p>
+          <p>Strukturiert. Klar. Produktiv.</p>
         </div>
       </footer>
     </div>
