@@ -1,0 +1,26 @@
+VIBE-WEB – wichtigste Commands (Windows / PowerShell)
+
+# 1) Projekt starten
+cd C:\Dev\Vibe\vibe-web
+npm run dev
+# App läuft dann auf: http://localhost:3000
+
+# 2) MCP / Supabase prüfen
+codex mcp list
+
+# 3) Wenn MCP Auth fehlt / "Auth required"
+codex mcp login supabase_ro
+codex mcp login supabase_rw
+# danach Cursor komplett neu starten
+
+# 4) Wenn npm run dev "package.json not found"
+# -> du bist im falschen Ordner, zuerst:
+cd C:\Dev\Vibe\vibe-web
+npm run dev
+
+# 5) Wenn /notes oder /projects Fehler "table not found"
+# -> Supabase SQL Editor öffnen und SQL für Tabelle/Policies ausführen
+
+# 6) Wenn Login klappt aber du kommst nicht ins Dashboard (Loop)
+# -> Email evtl. nicht bestätigt ODER middleware/session Thema prüfen
+# -> zuerst in Supabase: Auth → Users / Email bestätigt?
