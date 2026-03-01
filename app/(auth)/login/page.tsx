@@ -20,8 +20,8 @@ export default function LoginPage({
         </CardHeader>
         <CardContent>
           <form action={signIn} className="space-y-3">
-            <Input name="email" type="email" placeholder="email@domain.com" required />
-            <Input name="password" type="password" placeholder="Passwort" required />
+            <Input name="email" type="email" placeholder="email@domain.com" required className="focus-visible:border-aria focus-visible:ring-aria/30" />
+            <Input name="password" type="password" placeholder="Passwort" required className="focus-visible:border-aria focus-visible:ring-aria/30" />
             <Button type="submit" className="w-full">Einloggen</Button>
           </form>
 
