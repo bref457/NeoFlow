@@ -34,8 +34,8 @@ export default async function AppLayout({
     <div className="min-h-dvh bg-muted/20">
       <div className="mx-auto flex min-h-dvh max-w-7xl">
         <aside className="hidden w-72 shrink-0 border-r bg-background/80 px-4 py-6 md:block">
-          <Link href="/dashboard" className="px-2 text-base font-semibold tracking-tight">
-            NeoFlow
+          <Link href="/dashboard" className="px-2 font-mono text-base font-semibold tracking-widest text-aria">
+            ARIA
           </Link>
           <Separator className="my-4" />
           <AppNav />
@@ -46,7 +46,7 @@ export default async function AppLayout({
             <div className="flex h-16 items-center justify-between px-4 sm:px-6">
               <div className="flex items-center gap-3">
                 <MobileNavSheet />
-                <p className="text-sm font-medium md:hidden">NeoFlow</p>
+                <p className="font-mono text-sm font-semibold tracking-widest text-aria md:hidden">ARIA</p>
               </div>
 
               <DropdownMenu>

@@ -1,60 +1,128 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { Bot, Globe, StickyNote, Activity } from "lucide-react";
+
+const features = [
+  {
+    icon: Bot,
+    title: "ARIA Chat",
+    description: "Chatte direkt mit ARIA im Browser. Geteiltes Gedächtnis mit Telegram – ARIA kennt den Kontext auf allen Kanälen.",
+  },
+  {
+    icon: Activity,
+    title: "Service Status",
+    description: "Live-Übersicht aller Dienste: Ollama, n8n, Open WebUI, Scraper. Immer im Blick, ohne SSH.",
+  },
+  {
+    icon: Globe,
+    title: "Web-Automation",
+    description: "Webseiten analysieren, Morning Reports auslösen, OSINT-Recherchen – alles steuerbar via Telegram oder Web.",
+  },
+  {
+    icon: StickyNote,
+    title: "Notizen & Tasks",
+    description: "Persönliche Notizen und Projekte, synchronisiert über Supabase. Immer verfügbar.",
+  },
+];
 
 export default async function Home() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative flex min-h-dvh flex-col overflow-hidden">
+      {/* Glow background */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-[-12rem] h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute bottom-[-10rem] right-[-6rem] h-[20rem] w-[20rem] rounded-full bg-sky-300/20 blur-3xl" />
+        <div className="absolute left-1/2 top-[-8rem] h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-aria-glow blur-3xl" />
+        <div className="absolute bottom-0 right-[-4rem] h-[20rem] w-[20rem] rounded-full bg-aria-dim blur-3xl" />
       </div>
 
-      <main className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-5xl flex-col items-center justify-center gap-8 px-4 py-14 text-center sm:px-6 sm:py-20">
-        <p className="inline-flex rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-          NeoFlow Productivity App
-        </p>
+      {/* Nav */}
+      <header className="border-b border-border/40 bg-background/80 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <span className="font-mono text-sm font-semibold tracking-widest text-aria">
+            ARIA
+          </span>
+          <div className="flex items-center gap-2">
+            {user ? (
+              <Button asChild size="sm">
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/signup">Registrieren</Link>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
 
-        <div className="max-w-3xl space-y-4">
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
-            Build your productivity flow with NeoFlow
+      {/* Hero */}
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-12 px-4 py-20 text-center sm:px-6">
+        <div className="space-y-6">
+          <p className="inline-flex items-center gap-2 rounded-full border border-aria/30 bg-aria-dim px-3 py-1 font-mono text-xs text-aria">
+            <span className="size-1.5 rounded-full bg-aria animate-pulse" />
+            Autonomous Research &amp; Intelligence Agent
+          </p>
+
+          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl">
+            Dein persönlicher{" "}
+            <span className="text-aria">KI-Agent</span>
           </h1>
-          <p className="text-base text-muted-foreground sm:text-lg">
-            NeoFlow ist deine zentrale App für Projekte, Tasks, Notizen und Kalender.
-            Alles an einem Ort, klar strukturiert und einfach zu bedienen.
+
+          <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
+            ARIA verbindet Telegram, lokales LLM, Web-Automation und Erinnerungen
+            zu einem System — steuerbar von überall, läuft 24/7 auf eigenem Server.
           </p>
         </div>
 
         {!user ? (
-          <div className="flex w-full max-w-md flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
-            <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/signup">Sign up</Link>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button asChild size="lg" className="bg-aria text-black hover:bg-aria/90 font-semibold">
+              <Link href="/login">Einloggen</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-              <Link href="/login">Sign in</Link>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/signup">Account erstellen</Link>
             </Button>
           </div>
         ) : (
-          <div className="flex w-full max-w-md justify-center">
-            <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/dashboard">Zum Dashboard</Link>
-            </Button>
-          </div>
+          <Button asChild size="lg" className="bg-aria text-black hover:bg-aria/90 font-semibold">
+            <Link href="/chat">ARIA öffnen</Link>
+          </Button>
         )}
+
+        {/* Features */}
+        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+          {features.map((f) => {
+            const Icon = f.icon;
+            return (
+              <div
+                key={f.title}
+                className="rounded-xl border border-border/60 bg-card/50 p-6 text-left backdrop-blur transition-colors hover:border-aria/40"
+              >
+                <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-aria-dim">
+                  <Icon className="size-4 text-aria" />
+                </div>
+                <h3 className="mb-1 font-semibold">{f.title}</h3>
+                <p className="text-sm text-muted-foreground">{f.description}</p>
+              </div>
+            );
+          })}
+        </div>
       </main>
 
-      <footer className="border-t">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 text-sm text-muted-foreground sm:px-6">
-          <p>© {new Date().getFullYear()} NeoFlow</p>
-          <p>Strukturiert. Klar. Produktiv.</p>
+      <footer className="border-t border-border/40">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6">
+          <span className="font-mono text-aria">ARIA</span>
+          <span>Self-hosted · Private · 24/7</span>
         </div>
       </footer>
     </div>
   );
 }
-

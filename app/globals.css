@@ -116,6 +116,19 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ARIA accent green */
+:root {
+  --aria: oklch(0.75 0.2 142);
+  --aria-dim: oklch(0.75 0.2 142 / 15%);
+  --aria-glow: oklch(0.75 0.2 142 / 30%);
+}
+
+@theme inline {
+  --color-aria: var(--aria);
+  --color-aria-dim: var(--aria-dim);
+  --color-aria-glow: var(--aria-glow);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

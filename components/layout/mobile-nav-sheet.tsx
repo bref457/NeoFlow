@@ -25,7 +25,7 @@ export function MobileNavSheet() {
       </SheetTrigger>
       <SheetContent side="left" className="w-72">
         <SheetHeader>
-          <SheetTitle>NeoFlow</SheetTitle>
+          <SheetTitle className="font-mono tracking-widest text-aria">ARIA</SheetTitle>
           <SheetDescription>Navigation</SheetDescription>
         </SheetHeader>
         <div className="mt-6">

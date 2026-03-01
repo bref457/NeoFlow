@@ -24,7 +24,7 @@ export default async function ProjectsPage({
   const resolvedSearchParams = await searchParams;
   const query = String(resolvedSearchParams.q ?? "").trim();
   const colorParam = String(resolvedSearchParams.color ?? "").trim();
-  const colorFilter = PROJECT_PASTEL_COLORS.includes(colorParam) ? colorParam : "";
+  const colorFilter = PROJECT_PASTEL_COLORS.includes(colorParam as typeof PROJECT_PASTEL_COLORS[number]) ? colorParam as typeof PROJECT_PASTEL_COLORS[number] : "";
 
   const supabase = await createClient();
   const {

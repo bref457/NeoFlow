@@ -2,14 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2 } from "lucide-react";
+import { Activity, Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type AppNavProps = {
   className?: string;
   onNavigate?: () => void;
 };
+
+const ariaItems = [
+  { href: "/chat", label: "ARIA Chat", icon: Bot },
+  { href: "/status", label: "Service Status", icon: Activity },
+];
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -22,26 +28,36 @@ const navItems = [
 export function AppNav({ className, onNavigate }: AppNavProps) {
   const pathname = usePathname();
 
+  function NavButton({ href, label, icon: Icon }: { href: string; label: string; icon: React.ElementType }) {
+    const isActive = pathname === href || pathname.startsWith(`${href}/`);
+    return (
+      <Button
+        asChild
+        variant={isActive ? "secondary" : "ghost"}
+        className={cn("justify-start", isActive && "font-medium")}
+      >
+        <Link href={href} onClick={onNavigate}>
+          <Icon className="size-4" />
+          {label}
+        </Link>
+      </Button>
+    );
+  }
+
   return (
     <nav className={cn("flex flex-col gap-1", className)} aria-label="Hauptnavigation">
-      {navItems.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-        const Icon = item.icon;
+      <p className="px-2 pb-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-aria">
+        ARIA
+      </p>
+      {ariaItems.map((item) => (
+        <NavButton key={item.href} {...item} />
+      ))}
 
-        return (
-          <Button
-            key={item.href}
-            asChild
-            variant={isActive ? "secondary" : "ghost"}
-            className={cn("justify-start", isActive && "font-medium")}
-          >
-            <Link href={item.href} onClick={onNavigate}>
-              <Icon className="size-4" />
-              {item.label}
-            </Link>
-          </Button>
-        );
-      })}
+      <Separator className="my-3" />
+
+      {navItems.map((item) => (
+        <NavButton key={item.href} {...item} />
+      ))}
     </nav>
   );
 }
