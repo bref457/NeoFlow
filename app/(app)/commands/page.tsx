@@ -50,6 +50,7 @@ const sections: Section[] = [
       { label: "Notiz speichern", cmd: "/note <Text>" },
       { label: "Notizen anzeigen", cmd: "/notes" },
       { label: "Morning Report auslösen", cmd: "/morning" },
+      { label: "Aktuelle KI-News", cmd: "/kinews", note: "SearXNG-Suche + LLM-Zusammenfassung" },
       { label: "Webseite analysieren", cmd: "/scrape <URL>" },
       { label: "Letzte 5 Einträge", cmd: "/history" },
       { label: "Gesprächshistorie löschen", cmd: "/clear" },
