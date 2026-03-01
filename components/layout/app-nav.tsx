@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2 } from "lucide-react";
+import { Activity, Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Terminal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ type AppNavProps = {
 const ariaItems = [
   { href: "/chat", label: "ARIA Chat", icon: Bot },
   { href: "/status", label: "Service Status", icon: Activity },
+  { href: "/commands", label: "Commands", icon: Terminal },
 ];
 
 const navItems = [
