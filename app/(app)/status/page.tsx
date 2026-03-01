@@ -51,7 +51,7 @@ export default function StatusPage() {
   }, []);
 
   const checkedAt = data?.checked_at
-    ? new Date(data.checked_at).toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })
+    ? new Date(data.checked_at + "Z").toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })
     : null;
 
   const onlineCount = data?.services.filter((s) => s.status === "online").length ?? 0;
