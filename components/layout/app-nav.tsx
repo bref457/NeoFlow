@@ -47,15 +47,15 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
 
   return (
     <nav className={cn("flex flex-col gap-1", className)} aria-label="Hauptnavigation">
-      <p className="px-2 pb-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-aria">
-        ARIA
-      </p>
       {ariaItems.map((item) => (
         <NavButton key={item.href} {...item} />
       ))}
 
       <Separator className="my-3" />
 
+      <p className="px-2 pb-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-aria">
+        NeoFlow
+      </p>
       {navItems.map((item) => (
         <NavButton key={item.href} {...item} />
       ))}
