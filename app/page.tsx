@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
-import { Bot, Globe, StickyNote, Activity } from "lucide-react";
+import { Bot, Globe, StickyNote, Activity, LayoutDashboard } from "lucide-react";
 
 const features = [
   {
@@ -13,6 +13,12 @@ const features = [
     icon: Activity,
     title: "Service Status",
     description: "Live-Übersicht aller Dienste: Ollama, n8n, Open WebUI, Scraper. Immer im Blick, ohne SSH.",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Mission Control",
+    description: "Zentrales Dashboard: Live-Status aller Services, Bot-Aktivität, Security-Scans, Notizen und KI-Memory auf einen Blick.",
+    href: "https://dashboard.neo457.ch",
   },
   {
     icon: Globe,
@@ -101,10 +107,10 @@ export default async function Home() {
         <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
           {features.map((f) => {
             const Icon = f.icon;
-            return (
+            const card = (
               <div
                 key={f.title}
-                className="rounded-xl border border-border/60 bg-card/50 p-6 text-left backdrop-blur transition-colors hover:border-aria/40"
+                className={`rounded-xl border border-border/60 bg-card/50 p-6 text-left backdrop-blur transition-colors hover:border-aria/40${f.href ? " cursor-pointer" : ""}`}
               >
                 <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-aria-dim">
                   <Icon className="size-4 text-aria" />
@@ -112,6 +118,13 @@ export default async function Home() {
                 <h3 className="mb-1 font-semibold">{f.title}</h3>
                 <p className="text-sm text-muted-foreground">{f.description}</p>
               </div>
+            );
+            return f.href ? (
+              <a key={f.title} href={f.href} target="_blank" rel="noopener noreferrer" className="block">
+                {card}
+              </a>
+            ) : (
+              <div key={f.title}>{card}</div>
             );
           })}
         </div>
