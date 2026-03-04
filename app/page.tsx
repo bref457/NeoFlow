@@ -18,7 +18,6 @@ const features = [
     icon: LayoutDashboard,
     title: "Mission Control",
     description: "Zentrales Dashboard: Live-Status aller Services, Bot-Aktivität, Security-Scans, Notizen und KI-Memory auf einen Blick.",
-    href: "https://dashboard.neo457.ch",
   },
   {
     icon: Globe,
