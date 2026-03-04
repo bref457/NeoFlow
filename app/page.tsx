@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
-import { Bot, Globe, StickyNote, Activity, LayoutDashboard } from "lucide-react";
+import { Bot, Globe, StickyNote, Activity } from "lucide-react";
 
 const features = [
   {
@@ -13,11 +13,6 @@ const features = [
     icon: Activity,
     title: "Service Status",
     description: "Live-Übersicht aller Dienste: Ollama, n8n, Open WebUI, Scraper. Immer im Blick, ohne SSH.",
-  },
-  {
-    icon: LayoutDashboard,
-    title: "Mission Control",
-    description: "Zentrales Dashboard: Live-Status aller Services, Bot-Aktivität, Security-Scans, Notizen und KI-Memory auf einen Blick.",
   },
   {
     icon: Globe,
