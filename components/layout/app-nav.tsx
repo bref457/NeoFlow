@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot } from "lucide-react";
+import { Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -45,6 +45,12 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
         <Link href="/chat" onClick={onNavigate}>
           <Bot className="size-4" />
           ARIA Chat
+        </Link>
+      </Button>
+      <Button asChild variant={pathname === "/commands" ? "secondary" : "ghost"} className="justify-start">
+        <Link href="/commands" onClick={onNavigate}>
+          <Terminal className="size-4" />
+          Commands
         </Link>
       </Button>
       <Button asChild variant="ghost" className="justify-start">
