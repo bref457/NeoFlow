@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Terminal, Trash2, MonitorDot } from "lucide-react";
+import { Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -11,12 +11,6 @@ type AppNavProps = {
   className?: string;
   onNavigate?: () => void;
 };
-
-const ariaItems = [
-  { href: "/chat", label: "ARIA Chat", icon: Bot },
-  { href: "/status", label: "Service Status", icon: Activity },
-  { href: "/commands", label: "Commands", icon: Terminal },
-];
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -47,9 +41,12 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
 
   return (
     <nav className={cn("flex flex-col gap-1", className)} aria-label="Hauptnavigation">
-      {ariaItems.map((item) => (
-        <NavButton key={item.href} {...item} />
-      ))}
+      <Button asChild variant={pathname === "/chat" ? "secondary" : "ghost"} className="justify-start">
+        <Link href="/chat" onClick={onNavigate}>
+          <Bot className="size-4" />
+          ARIA Chat
+        </Link>
+      </Button>
       <Button asChild variant="ghost" className="justify-start">
         <a href="https://dashboard.neo457.ch" target="_blank" rel="noopener noreferrer" onClick={onNavigate}>
           <MonitorDot className="size-4" />

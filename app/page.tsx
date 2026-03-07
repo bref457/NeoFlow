@@ -1,30 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
-import { Bot, Globe, StickyNote, Activity } from "lucide-react";
-
-const features = [
-  {
-    icon: Bot,
-    title: "ARIA Chat",
-    description: "Chatte direkt mit ARIA im Browser. Geteiltes Gedächtnis mit Telegram – ARIA kennt den Kontext auf allen Kanälen.",
-  },
-  {
-    icon: Activity,
-    title: "Service Status",
-    description: "Live-Übersicht aller Dienste: Ollama, n8n, Open WebUI, Scraper. Immer im Blick, ohne SSH.",
-  },
-  {
-    icon: Globe,
-    title: "Web-Automation",
-    description: "Webseiten analysieren, Morning Reports auslösen, OSINT-Recherchen – alles steuerbar via Telegram oder Web.",
-  },
-  {
-    icon: StickyNote,
-    title: "Notizen & Tasks",
-    description: "Persönliche Notizen und Projekte, synchronisiert über Supabase. Immer verfügbar.",
-  },
-];
 
 export default async function Home() {
   const supabase = await createClient();
@@ -45,11 +21,7 @@ export default async function Home() {
             ARIA
           </span>
           <div className="flex items-center gap-2">
-            {user ? (
-              <Button asChild size="sm">
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-            ) : (
+            {!user && (
               <>
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/login">Login</Link>
@@ -96,32 +68,6 @@ export default async function Home() {
             <Link href="/chat">ARIA öffnen</Link>
           </Button>
         )}
-
-        {/* Features */}
-        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
-          {features.map((f) => {
-            const Icon = f.icon;
-            const card = (
-              <div
-                key={f.title}
-                className={`rounded-xl border border-border/60 bg-card/50 p-6 text-left backdrop-blur transition-colors hover:border-aria/40${f.href ? " cursor-pointer" : ""}`}
-              >
-                <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-aria-dim">
-                  <Icon className="size-4 text-aria" />
-                </div>
-                <h3 className="mb-1 font-semibold">{f.title}</h3>
-                <p className="text-sm text-muted-foreground">{f.description}</p>
-              </div>
-            );
-            return f.href ? (
-              <a key={f.title} href={f.href} target="_blank" rel="noopener noreferrer" className="block">
-                {card}
-              </a>
-            ) : (
-              <div key={f.title}>{card}</div>
-            );
-          })}
-        </div>
       </main>
 
       <footer className="border-t border-border/40">
