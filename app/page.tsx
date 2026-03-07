@@ -71,8 +71,7 @@ export default async function Home() {
       </main>
 
       <footer className="border-t border-border/40">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6">
-          <span className="font-mono text-aria">ARIA</span>
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-end px-4 text-xs text-muted-foreground sm:px-6">
           <span>Self-hosted · Private · 24/7</span>
         </div>
       </footer>
