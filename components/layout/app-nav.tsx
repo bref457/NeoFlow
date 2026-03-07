@@ -53,11 +53,11 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
           Commands
         </Link>
       </Button>
-      <Button asChild variant="ghost" className="justify-start">
-        <a href="https://dashboard.neo457.ch" target="_blank" rel="noopener noreferrer" onClick={onNavigate}>
+      <Button asChild variant={pathname === "/mission-control" ? "secondary" : "ghost"} className="justify-start">
+        <Link href="/mission-control" onClick={onNavigate}>
           <MonitorDot className="size-4" />
           Mission Control
-        </a>
+        </Link>
       </Button>
 
       <Separator className="my-3" />
