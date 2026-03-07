@@ -22,7 +22,7 @@ export default function LoginPage({
           <form action={signIn} className="space-y-3">
             <Input name="email" type="email" placeholder="email@domain.com" required className="focus-visible:border-aria focus-visible:ring-aria/30" />
             <Input name="password" type="password" placeholder="Passwort" required className="focus-visible:border-aria focus-visible:ring-aria/30" />
-            <Button type="submit" className="w-full">Einloggen</Button>
+            <Button type="submit" className="w-full bg-aria text-black hover:bg-aria/90 font-semibold btn-shimmer">Einloggen</Button>
           </form>
 
           <p className="mt-4 text-sm text-muted-foreground">
