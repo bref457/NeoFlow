@@ -14,11 +14,15 @@ const sections: Section[] = [
     title: "SSH Verbindungen",
     items: [
       { label: "VPS verbinden", cmd: "ssh -i ~/.ssh/aria_vps root@162.55.209.62" },
-      { label: "Pi verbinden (lokal)", cmd: "ssh -i ~/.ssh/piclaw neo@192.168.1.221" },
       {
-        label: "n8n Tunnel (von überall)",
-        cmd: "ssh -i ~/.ssh/aria_vps -L 5678:10.0.0.3:5678 root@162.55.209.62",
+        label: "n8n öffnen (WireGuard)",
+        cmd: "ssh -i ~/.ssh/aria_vps -L 5678:localhost:5678 root@162.55.209.62",
         note: "Dann http://localhost:5678 öffnen",
+      },
+      {
+        label: "Open WebUI öffnen (WireGuard)",
+        cmd: "ssh -i ~/.ssh/aria_vps -L 8080:localhost:8080 root@162.55.209.62",
+        note: "Dann http://localhost:8080 öffnen",
       },
     ],
   },
@@ -35,13 +39,23 @@ const sections: Section[] = [
     ],
   },
   {
+    title: "AROC (KI-Coding-Agent)",
+    items: [
+      { label: "Status prüfen", cmd: "systemctl status aroc" },
+      { label: "Neustarten", cmd: "systemctl restart aroc" },
+      { label: "Logs live", cmd: "journalctl -u aroc -f" },
+      { label: "n8n-Tools anzeigen", cmd: "mcporter list n8n" },
+      { label: "Telegram", cmd: "@ario_457_bot", note: "Coding-Aufgaben, n8n-Automationen, Shell" },
+    ],
+  },
+  {
     title: "Claude Code",
     items: [
       { label: "Nutzung & Limits anzeigen", cmd: "npx ccusage" },
     ],
   },
   {
-    title: "Telegram Bot Commands",
+    title: "ARIA – Telegram @aria_bot",
     items: [
       { label: "Direkte Nachricht", cmd: "<text>", note: "Chat mit ARIA (LLM + Gesprächsgedächtnis)" },
       { label: "LLM-Frage", cmd: "/ask <frage>" },
@@ -56,7 +70,6 @@ const sections: Section[] = [
       { label: "Gesprächshistorie löschen", cmd: "/clear" },
       { label: "Dienststatus", cmd: "/status" },
       { label: "OSINT-Abfrage", cmd: "/osint <Domain>" },
-      { label: "Alle Commands", cmd: "/start" },
     ],
   },
 ];
