@@ -18,9 +18,16 @@ export async function createNote(formData: FormData) {
     return;
   }
 
+  const category = String(formData.get("category") ?? "note").trim();
+  const app_name = String(formData.get("app_name") ?? "").trim() || null;
+  const source = String(formData.get("source") ?? "").trim() || null;
+
   const { error } = await supabase.from("notes").insert({
     user_id: user.id,
     content,
+    category: ["note", "feedback", "brainstorming", "infra", "claude"].includes(category) ? category : "note",
+    app_name: app_name || null,
+    source: source || null,
   });
 
   if (error) {

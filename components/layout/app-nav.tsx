@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot, Terminal } from "lucide-react";
+import { Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot, Terminal, MessageSquareDot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/notes", label: "Notes", icon: NotebookPen },
   { href: "/projects", label: "Projects", icon: FolderKanban },
+  { href: "/feedback", label: "Feedback", icon: MessageSquareDot },
   { href: "/trash", label: "Papierkorb", icon: Trash2 },
 ];
 

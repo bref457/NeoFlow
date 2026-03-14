@@ -42,7 +42,14 @@ for delete
 to authenticated
 using (auth.uid() = user_id);
 
+alter table public.notes add column if not exists category text default 'note'
+  check (category in ('note', 'feedback', 'brainstorming', 'infra', 'claude'));
+alter table public.notes add column if not exists app_name text;
+alter table public.notes add column if not exists source text;
+
 create index if not exists notes_user_id_created_at_idx
 on public.notes (user_id, created_at desc);
 create index if not exists notes_user_id_archived_at_idx
 on public.notes (user_id, archived_at);
+create index if not exists notes_user_id_category_idx
+on public.notes (user_id, category);
