@@ -10,6 +10,14 @@ Kurzer Smoke-Test vor `Commit + Push`.
 - Notiz erstellen, bearbeiten, löschen.
 - Nach Löschen erscheint `Rückgängig` und funktioniert.
 - Suchfilter (`q`) liefert korrekte Treffer.
+- Kategorie-Filter (note/feedback/brainstorming/infra/claude) funktioniert.
+- App-Filter (gartenplaner/aria/dishboard/neoflow) funktioniert.
+- Kategorie-Badge erscheint korrekt auf jedem Eintrag.
+
+## 2b. Feedback
+- Feedback-Seite unter `/feedback` erreichbar.
+- Neues Feedback mit App + Quelle erfassen.
+- Filter nach App funktioniert.
 
 ## 3. Projects
 - Projekt erstellen (inkl. Farbe), bearbeiten, löschen.
