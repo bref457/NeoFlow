@@ -19,6 +19,13 @@ type ClaudeUsage = {
   models: Record<string, number>;
   sessions_by_day: Record<string, number>;
 };
+type ClaudeLimit = {
+  hourly_percent: number | null;
+  weekly_percent: number | null;
+  hourly_resets: string | null;
+  weekly_resets: string | null;
+  updated_at: string | null;
+};
 
 // ─── STATUS DOT ─────────────────────────────────────────────────────────────
 function StatusDot({ status }: { status: string }) {
@@ -139,19 +146,22 @@ export default function MissionControl() {
   const [containers, setContainers] = useState<ContainerItem[]>([]);
   const [system, setSystem] = useState<SystemStats | null>(null);
   const [claudeUsage, setClaudeUsage] = useState<ClaudeUsage | null>(null);
+  const [claudeLimit, setClaudeLimit] = useState<ClaudeLimit | null>(null);
   const [lastUpdate, setLastUpdate] = useState("");
 
   const refresh = useCallback(async () => {
-    const [sRes, dRes, syRes, cuRes] = await Promise.allSettled([
+    const [sRes, dRes, syRes, cuRes, clRes] = await Promise.allSettled([
       fetch("/api/aria/dashboard/status").then(r => r.json()),
       fetch("/api/aria/dashboard/docker").then(r => r.json()),
       fetch("/api/aria/dashboard/system").then(r => r.json()),
       fetch("/api/aria/dashboard/claude-usage").then(r => r.json()),
+      fetch("/api/aria/dashboard/claude-limit").then(r => r.json()),
     ]);
     if (sRes.status === "fulfilled") setServices(sRes.value.services ?? []);
     if (dRes.status === "fulfilled") setContainers(dRes.value.containers ?? []);
     if (syRes.status === "fulfilled") setSystem(syRes.value);
     if (cuRes.status === "fulfilled") setClaudeUsage(cuRes.value);
+    if (clRes.status === "fulfilled") setClaudeLimit(clRes.value);
     setLastUpdate(new Date().toLocaleTimeString("de-CH"));
   }, []);
 
@@ -215,8 +225,60 @@ export default function MissionControl() {
               </div>
             ))}
           </div>
+          {/* Limit bars from Chrome extension data */}
+          {claudeLimit && (claudeLimit.hourly_percent !== null || claudeLimit.weekly_percent !== null) && (
+            <div className="border-t border-aria/20 px-4 py-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {claudeLimit.hourly_percent !== null && (
+                <div className="space-y-1.5">
+                  <div className="flex justify-between font-mono text-[10px]">
+                    <span className="text-muted-foreground uppercase tracking-widest">5h Limit</span>
+                    <span className={claudeLimit.hourly_percent >= 80 ? "text-red-400" : claudeLimit.hourly_percent >= 60 ? "text-yellow-400" : "text-aria"}>
+                      {claudeLimit.hourly_percent}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full ${claudeLimit.hourly_percent >= 80 ? "bg-red-500" : claudeLimit.hourly_percent >= 60 ? "bg-yellow-500" : "bg-aria"}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${claudeLimit.hourly_percent}%` }}
+                      transition={{ type: "spring", stiffness: 80, damping: 20 }}
+                    />
+                  </div>
+                  {claudeLimit.hourly_resets && (
+                    <p className="font-mono text-[9px] text-muted-foreground">Resets {claudeLimit.hourly_resets}</p>
+                  )}
+                </div>
+              )}
+              {claudeLimit.weekly_percent !== null && (
+                <div className="space-y-1.5">
+                  <div className="flex justify-between font-mono text-[10px]">
+                    <span className="text-muted-foreground uppercase tracking-widest">7 Tage Limit</span>
+                    <span className={claudeLimit.weekly_percent >= 80 ? "text-red-400" : claudeLimit.weekly_percent >= 60 ? "text-yellow-400" : "text-aria"}>
+                      {claudeLimit.weekly_percent}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full ${claudeLimit.weekly_percent >= 80 ? "bg-red-500" : claudeLimit.weekly_percent >= 60 ? "bg-yellow-500" : "bg-aria"}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${claudeLimit.weekly_percent}%` }}
+                      transition={{ type: "spring", stiffness: 80, damping: 20 }}
+                    />
+                  </div>
+                  {claudeLimit.weekly_resets && (
+                    <p className="font-mono text-[9px] text-muted-foreground">Resets {claudeLimit.weekly_resets}</p>
+                  )}
+                </div>
+              )}
+              {claudeLimit.updated_at && (
+                <p className="sm:col-span-2 font-mono text-[9px] text-muted-foreground/50">
+                  Zuletzt via Bookmarklet: {new Date(claudeLimit.updated_at).toLocaleString("de-CH")}
+                </p>
+              )}
+            </div>
+          )}
           {Object.keys(claudeUsage.sessions_by_day).length > 0 && (
-            <div className="px-4 py-2.5 flex items-center gap-4 flex-wrap">
+            <div className="px-4 py-2.5 flex items-center gap-4 flex-wrap border-t border-aria/10">
               {Object.entries(claudeUsage.sessions_by_day).map(([day, count]) => (
                 <span key={day} className="font-mono text-[10px] text-muted-foreground">
                   {day}: <span className="text-aria font-semibold">{count} sessions</span>
