@@ -150,8 +150,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="relative overflow-hidden border-border/70 shadow-sm">
-        <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
+      <Card className="border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle>Fortschritt gesamt</CardTitle>
           <CardDescription>
@@ -166,7 +165,8 @@ export default async function DashboardPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/70 shadow-sm">
+      <Card className="relative overflow-hidden border-border/70 shadow-sm">
+        <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
         <CardHeader>
           <CardTitle>Neueste Projekte</CardTitle>
           <CardDescription>Schneller Zugriff auf deine zuletzt erstellten Projekte.</CardDescription>
