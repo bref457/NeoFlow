@@ -3,23 +3,136 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useAnimationFrame } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   ExternalLink, Sprout, UtensilsCrossed, MonitorDot,
   Github, Server, Laptop, MessageSquare, Globe, Lock,
 } from "lucide-react";
 
-const stack = [
-  "Next.js", "TypeScript", "Tailwind CSS", "Supabase",
-  "Docker", "nginx", "Hetzner", "Claude Code",
-];
+// ─── METEORS ────────────────────────────────────────────────────────────────
+function Meteors({ number = 18 }: { number?: number }) {
+  const [styles, setStyles] = useState<React.CSSProperties[]>([]);
+  useEffect(() => {
+    setStyles(
+      Array.from({ length: number }, () => ({
+        top: "-5px",
+        left: Math.floor(Math.random() * (typeof window !== "undefined" ? window.innerWidth : 1200)) + "px",
+        animationDelay: (Math.random() * 4).toFixed(2) + "s",
+        animationDuration: (Math.random() * 6 + 4).toFixed(2) + "s",
+      }))
+    );
+  }, [number]);
 
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {styles.map((s, i) => (
+        <span
+          key={i}
+          className="animate-meteor absolute h-px w-px rotate-[215deg] rounded-full bg-white/70 shadow-[0_0_0_1px_#ffffff15]"
+          style={s}
+        >
+          <div className="absolute top-1/2 -z-10 h-px w-[80px] -translate-y-1/2 bg-gradient-to-r from-white/60 to-transparent" />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// ─── SPARKLES ───────────────────────────────────────────────────────────────
+const SPARKLE_COLORS = ["#4ade80", "#22d3ee", "#a78bfa", "#f9fafb"];
+
+function Sparkle({ x, y, color, size, delay }: { x: string | number; y: string | number; color: string; size: number; delay: number }) {
+  return (
+    <motion.svg
+      className="pointer-events-none absolute"
+      style={{ left: x, top: y, width: size, height: size }}
+      viewBox="0 0 160 160"
+      initial={{ scale: 0, opacity: 0, rotate: 0 }}
+      animate={{ scale: [0, 1, 0], opacity: [0, 1, 0], rotate: [0, 90] }}
+      transition={{ duration: 1.2, delay, ease: "easeInOut", repeat: Infinity, repeatDelay: Math.random() * 3 + 2 }}
+    >
+      <path
+        d="M80 0 C80 0 84 76 160 80 C84 84 80 160 80 160 C80 160 76 84 0 80 C76 76 80 0 80 0Z"
+        fill={color}
+      />
+    </motion.svg>
+  );
+}
+
+function Sparkles({ count = 8 }: { count?: number }) {
+  const [items] = useState(() =>
+    Array.from({ length: count }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      color: SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)],
+      size: Math.random() * 16 + 10,
+      delay: Math.random() * 2,
+    }))
+  );
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {items.map((s) => (
+        <Sparkle key={s.id} x={s.x + "%"} y={s.y + "%"} color={s.color} size={s.size} delay={s.delay} />
+      ))}
+    </div>
+  );
+}
+
+// ─── BORDER BEAM ────────────────────────────────────────────────────────────
+function BorderBeam({
+  size = 120,
+  duration = 8,
+  colorFrom = "#4ade80",
+  colorTo = "#22d3ee",
+}: {
+  size?: number;
+  duration?: number;
+  colorFrom?: string;
+  colorTo?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  useAnimationFrame((t) => {
+    if (!ref.current) return;
+    const progress = (t / 1000 / duration) % 1;
+    ref.current.style.setProperty("--progress", String(progress));
+  });
+
+  return (
+    <div
+      ref={ref}
+      className="pointer-events-none absolute inset-0 rounded-[inherit] overflow-hidden"
+      style={
+        {
+          "--size": size + "px",
+          "--color-from": colorFrom,
+          "--color-to": colorTo,
+        } as React.CSSProperties
+      }
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `conic-gradient(from calc(var(--progress, 0) * 360deg) at 50% 50%, transparent 0deg, ${colorFrom} 60deg, ${colorTo} 120deg, transparent 180deg)`,
+          borderRadius: "inherit",
+          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          maskComposite: "exclude",
+          WebkitMaskComposite: "xor",
+          padding: "1px",
+        }}
+      />
+    </div>
+  );
+}
+
+// ─── TERMINAL ───────────────────────────────────────────────────────────────
 const terminalSequence = [
   { prefix: "~", cmd: "ssh root@neo457.ch", type: "cmd" },
   { prefix: "vps", cmd: "docker ps", type: "cmd" },
-  { prefix: "", cmd: "neodish     ↑ running", type: "out" },
-  { prefix: "", cmd: "neogarden   ↑ running", type: "out" },
+  { prefix: "", cmd: "neodish      ↑ running", type: "out" },
+  { prefix: "", cmd: "neogarden    ↑ running", type: "out" },
   { prefix: "vps", cmd: "claude  # Mission Control", type: "cmd" },
   { prefix: "vps", cmd: "git pull && docker compose up -d", type: "cmd" },
 ];
@@ -32,11 +145,7 @@ function TerminalBlock() {
   useEffect(() => {
     if (!inView) return;
     let i = 0;
-    const tick = () => {
-      i++;
-      setVisible(i);
-      if (i < terminalSequence.length) setTimeout(tick, 550);
-    };
+    const tick = () => { i++; setVisible(i); if (i < terminalSequence.length) setTimeout(tick, 550); };
     setTimeout(tick, 200);
   }, [inView]);
 
@@ -50,30 +159,18 @@ function TerminalBlock() {
       </div>
       <div className="p-5 font-mono text-[12px] leading-7 space-y-0.5 min-h-[200px]">
         {terminalSequence.slice(0, visible).map((line, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -6 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.25 }}
-            className="flex gap-2"
-          >
-            {line.prefix && (
-              <span className="text-aria select-none shrink-0">{line.prefix} $</span>
-            )}
-            {!line.prefix && <span className="text-aria/30 select-none shrink-0 pl-4">→</span>}
-            <span className={line.type === "out" ? "text-muted-foreground" : "text-foreground/85"}>
-              {line.cmd}
-            </span>
+          <motion.div key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }} className="flex gap-2">
+            {line.prefix
+              ? <span className="text-aria select-none shrink-0">{line.prefix} $</span>
+              : <span className="text-aria/30 select-none shrink-0 pl-4">→</span>
+            }
+            <span className={line.type === "out" ? "text-muted-foreground" : "text-foreground/85"}>{line.cmd}</span>
           </motion.div>
         ))}
         {visible >= terminalSequence.length && (
           <div className="flex gap-2">
             <span className="text-aria select-none">vps $</span>
-            <motion.span
-              animate={{ opacity: [1, 0] }}
-              transition={{ duration: 0.8, repeat: Infinity }}
-              className="text-aria"
-            >▋</motion.span>
+            <motion.span animate={{ opacity: [1, 0] }} transition={{ duration: 0.8, repeat: Infinity }} className="text-aria">▋</motion.span>
           </div>
         )}
       </div>
@@ -81,11 +178,14 @@ function TerminalBlock() {
   );
 }
 
+// ─── MAIN ───────────────────────────────────────────────────────────────────
+const stack = ["Next.js", "TypeScript", "Tailwind CSS", "Supabase", "Docker", "nginx", "Hetzner", "Claude Code"];
+
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
   show: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { duration: 0.5, delay: i * 0.1, ease: "easeOut" as const },
   }),
 };
 
@@ -96,9 +196,6 @@ export default function Home() {
         @keyframes gradient-shift {
           0%,100%{background-position:0% 50%}50%{background-position:100% 50%}
         }
-        @keyframes float {
-          0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}
-        }
         .gradient-text{
           background:linear-gradient(135deg,#4ade80,#22d3ee,#a78bfa,#4ade80);
           background-size:300% 300%;
@@ -107,25 +204,13 @@ export default function Home() {
           background-clip:text;
           animation:gradient-shift 5s ease infinite;
         }
-        .card-glow{position:relative;transition:all 0.3s;}
-        .card-glow::before{
-          content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;
-          background:linear-gradient(135deg,rgba(74,222,128,0),rgba(74,222,128,0));
-          -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-          -webkit-mask-composite:xor;mask-composite:exclude;
-          transition:all 0.3s;opacity:0;
-        }
-        .card-glow:hover::before{
-          background:linear-gradient(135deg,rgba(74,222,128,0.5),rgba(34,211,238,0.25),rgba(167,139,250,0.25));
-          opacity:1;
-        }
       `}</style>
 
       <div className="relative min-h-dvh bg-background text-foreground overflow-hidden">
 
-        {/* Backgrounds */}
+        {/* Dot-grid */}
         <div className="pointer-events-none fixed inset-0 -z-20"
-          style={{ backgroundImage: "radial-gradient(circle,rgba(74,222,128,0.08) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
+          style={{ backgroundImage: "radial-gradient(circle,rgba(74,222,128,0.07) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_90%_55%_at_50%_-5%,transparent_0%,hsl(var(--background))_65%)]" />
         <div className="pointer-events-none fixed left-1/2 top-[-12rem] -z-10 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full bg-aria-glow blur-3xl opacity-35" />
         <div className="pointer-events-none fixed -left-32 top-1/3 -z-10 h-64 w-64 rounded-full bg-aria-glow blur-3xl opacity-15" />
@@ -154,9 +239,12 @@ export default function Home() {
 
         <main className="mx-auto max-w-7xl px-5 sm:px-8">
 
-          {/* HERO */}
-          <section className="pt-20 pb-16 sm:pt-28 sm:pb-20">
-            <div className="max-w-4xl space-y-6">
+          {/* HERO — with Meteors + Sparkles */}
+          <section className="relative pt-20 pb-16 sm:pt-28 sm:pb-20 overflow-hidden">
+            <Meteors number={18} />
+            <Sparkles count={10} />
+
+            <div className="relative z-10 max-w-4xl space-y-6">
               <motion.p
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -187,10 +275,9 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.35 }}
-                className="flex items-center gap-4 pt-2"
               >
                 <a href="https://github.com/bref457" target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border border-border/50 bg-muted/20 px-4 py-2 font-mono text-xs text-muted-foreground transition-all hover:border-aria/40 hover:text-foreground">
+                  className="inline-flex items-center gap-2 rounded-lg border border-border/50 bg-muted/20 px-4 py-2 font-mono text-xs text-muted-foreground transition-all hover:border-aria/40 hover:text-foreground">
                   <Github className="size-3.5" />
                   github.com/bref457
                   <ExternalLink className="size-3" />
@@ -215,16 +302,17 @@ export default function Home() {
               {/* NeoGarden */}
               <motion.a
                 href="https://garten.neo457.ch" target="_blank" rel="noopener noreferrer"
-                className="card-glow group lg:col-span-2 rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur hover:bg-card/70"
+                className="group relative lg:col-span-2 rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
                 style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 variants={fadeUp} initial="hidden" whileInView="show" custom={0}
                 viewport={{ once: true }}
-                whileHover={{ y: -3 }} transition={{ duration: 0.2 }}
+                whileHover={{ y: -3 }}
               >
-                <div className="flex h-full flex-col gap-4">
+                <div className="absolute inset-0 bg-gradient-to-br from-aria/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative flex h-full flex-col gap-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-aria/30 transition-colors">
+                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-aria/40 transition-colors">
                         <Sprout className="size-5 text-aria" />
                       </div>
                       <div>
@@ -250,26 +338,27 @@ export default function Home() {
               {/* NeoDish */}
               <motion.a
                 href="https://essen.neo457.ch" target="_blank" rel="noopener noreferrer"
-                className="card-glow group rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur hover:bg-card/70"
+                className="group relative rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
                 style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 variants={fadeUp} initial="hidden" whileInView="show" custom={1}
                 viewport={{ once: true }}
-                whileHover={{ y: -3 }} transition={{ duration: 0.2 }}
+                whileHover={{ y: -3 }}
               >
-                <div className="flex h-full flex-col gap-4">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative flex h-full flex-col gap-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-aria/30 transition-colors">
-                        <UtensilsCrossed className="size-5 text-aria" />
+                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-cyan-400/40 transition-colors">
+                        <UtensilsCrossed className="size-5 text-cyan-400" />
                       </div>
                       <div>
                         <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">02</p>
                         <h2 className="text-base font-bold">NeoDish</h2>
                       </div>
                     </div>
-                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-aria group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-cyan-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
-                  <p className="font-mono text-[11px] text-aria">Keine Frage mehr: Was essen wir heute?</p>
+                  <p className="font-mono text-[11px] text-cyan-400">Keine Frage mehr: Was essen wir heute?</p>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
                     Wochenplaner für Mahlzeiten. Rezepte organisieren,
                     Wochen vorplanen, Einkaufsliste auf Knopfdruck.
@@ -282,15 +371,18 @@ export default function Home() {
                 </div>
               </motion.a>
 
-              {/* NeoFlow */}
+              {/* NeoFlow — with BorderBeam */}
               <motion.div
-                className="card-glow group lg:col-span-3 rounded-2xl border border-aria/20 bg-card/40 p-6 backdrop-blur"
-                style={{ boxShadow: "inset 0 1px 0 rgba(74,222,128,0.05),0 0 40px rgba(74,222,128,0.04)" }}
+                className="relative group lg:col-span-3 rounded-2xl border border-aria/25 bg-card/40 p-6 backdrop-blur overflow-hidden"
+                style={{ boxShadow: "inset 0 1px 0 rgba(74,222,128,0.05), 0 0 60px rgba(74,222,128,0.06)" }}
                 variants={fadeUp} initial="hidden" whileInView="show" custom={2}
                 viewport={{ once: true }}
-                whileHover={{ y: -2 }} transition={{ duration: 0.2 }}
+                whileHover={{ y: -2 }}
               >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <BorderBeam size={200} duration={6} colorFrom="#4ade80" colorTo="#22d3ee" />
+                <div className="absolute inset-0 bg-gradient-to-br from-aria/5 via-transparent to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex flex-col gap-4 flex-1">
                     <div className="flex items-center gap-3">
                       <div className="flex size-11 items-center justify-center rounded-xl border border-aria/30 bg-aria-dim">
@@ -334,21 +426,20 @@ export default function Home() {
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <TerminalBlock />
-
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { icon: Laptop, label: "Laptop", detail: "VS Code + Claude Code", color: "text-aria", delay: 0 },
-                  { icon: Server, label: "VPS (Hetzner)", detail: "Docker · nginx · 24/7", color: "text-cyan-400", delay: 0.1 },
-                  { icon: MessageSquare, label: "Telegram", detail: "ARIA Bot · unterwegs", color: "text-violet-400", delay: 0.2 },
-                  { icon: Globe, label: "Remote", detail: "vscode.neo457.ch", color: "text-emerald-400", delay: 0.3 },
+                  { icon: Laptop, label: "Laptop", detail: "VS Code + Claude Code", color: "text-aria", glow: "rgba(74,222,128,0.15)", delay: 0 },
+                  { icon: Server, label: "VPS (Hetzner)", detail: "Docker · nginx · 24/7", color: "text-cyan-400", glow: "rgba(34,211,238,0.15)", delay: 1 },
+                  { icon: MessageSquare, label: "Telegram", detail: "ARIA Bot · unterwegs", color: "text-violet-400", glow: "rgba(167,139,250,0.15)", delay: 2 },
+                  { icon: Globe, label: "Remote", detail: "vscode.neo457.ch", color: "text-emerald-400", glow: "rgba(52,211,153,0.15)", delay: 3 },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
                     <motion.div
                       key={item.label}
-                      variants={fadeUp} initial="hidden" whileInView="show" custom={item.delay * 10}
+                      variants={fadeUp} initial="hidden" whileInView="show" custom={item.delay}
                       viewport={{ once: true }}
-                      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+                      whileHover={{ y: -3, boxShadow: `0 8px 30px ${item.glow}` }}
                       className="rounded-xl border border-border/50 bg-card/30 p-4 flex flex-col gap-3 hover:border-border/80 transition-colors cursor-default"
                     >
                       <div className="flex size-9 items-center justify-center rounded-lg border border-border/60 bg-muted/40">
@@ -378,12 +469,12 @@ export default function Home() {
             <motion.div
               className="flex flex-wrap gap-2"
               initial="hidden" whileInView="show" viewport={{ once: true }}
-              variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+              variants={{ show: { transition: { staggerChildren: 0.06 } } }}
             >
               {stack.map((tech) => (
                 <motion.span
                   key={tech}
-                  variants={{ hidden: { opacity: 0, scale: 0.85 }, show: { opacity: 1, scale: 1 } }}
+                  variants={{ hidden: { opacity: 0, scale: 0.8 }, show: { opacity: 1, scale: 1 } }}
                   whileHover={{ y: -2, transition: { duration: 0.15 } }}
                   className="rounded-lg border border-border/50 bg-muted/20 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:border-aria/30 hover:text-foreground transition-colors cursor-default"
                 >
