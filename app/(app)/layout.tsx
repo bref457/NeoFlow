@@ -61,6 +61,12 @@ export default async function AppLayout({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
+                    <Link href="/" className="w-full cursor-pointer">
+                      Zur Startseite
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
                     <form action={signOut} className="w-full">
                       <button type="submit" className="w-full cursor-pointer text-left">
                         Logout
