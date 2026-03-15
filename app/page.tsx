@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useAnimationFrame } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   ExternalLink, Sprout, UtensilsCrossed, MonitorDot,
@@ -51,52 +51,6 @@ function Sparkles({ count = 8 }: { count?: number }) {
   );
 }
 
-// ─── BORDER BEAM ────────────────────────────────────────────────────────────
-function BorderBeam({
-  size = 120,
-  duration = 8,
-  colorFrom = "#4ade80",
-  colorTo = "#22d3ee",
-}: {
-  size?: number;
-  duration?: number;
-  colorFrom?: string;
-  colorTo?: string;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  useAnimationFrame((t) => {
-    if (!ref.current) return;
-    const progress = (t / 1000 / duration) % 1;
-    ref.current.style.setProperty("--progress", String(progress));
-  });
-
-  return (
-    <div
-      ref={ref}
-      className="pointer-events-none absolute inset-0 rounded-[inherit] overflow-hidden"
-      style={
-        {
-          "--size": size + "px",
-          "--color-from": colorFrom,
-          "--color-to": colorTo,
-        } as React.CSSProperties
-      }
-    >
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `conic-gradient(from calc(var(--progress, 0) * 360deg) at 50% 50%, transparent 0deg, ${colorFrom} 60deg, ${colorTo} 120deg, transparent 180deg)`,
-          borderRadius: "inherit",
-          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          maskComposite: "exclude",
-          WebkitMaskComposite: "xor",
-          padding: "1px",
-        }}
-      />
-    </div>
-  );
-}
 
 // ─── TERMINAL ───────────────────────────────────────────────────────────────
 const terminalSequence = [
@@ -272,7 +226,7 @@ export default function Home() {
               {/* NeoGarden */}
               <motion.a
                 href="https://garten.neo457.ch" target="_blank" rel="noopener noreferrer"
-                className="group relative lg:col-span-2 rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
+                className="group relative rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
                 style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 variants={fadeUp} initial="hidden" whileInView="show" custom={0}
                 viewport={{ once: true }}
@@ -341,16 +295,15 @@ export default function Home() {
                 </div>
               </motion.a>
 
-              {/* NeoFlow — with BorderBeam */}
+              {/* NeoFlow */}
               <motion.div
-                className="relative group lg:col-span-3 rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
+                className="relative group rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
                 style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 variants={fadeUp} initial="hidden" whileInView="show" custom={2}
                 viewport={{ once: true }}
-                whileHover={{ y: -2 }}
+                whileHover={{ y: -3 }}
               >
-                <BorderBeam size={200} duration={6} colorFrom="#4ade80" colorTo="#22d3ee" />
-                <div className="absolute inset-0 bg-gradient-to-br from-aria/5 via-transparent to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-aria/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex flex-col gap-4 flex-1">
