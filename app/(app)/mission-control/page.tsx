@@ -2,13 +2,22 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Server, HardDrive, Container, Activity } from "lucide-react";
+import { Server, HardDrive, Container, Activity, BrainCircuit } from "lucide-react";
 
 type Service = { name: string; status: string; latency_ms: number | null };
 type ContainerItem = { name: string; status: string; uptime: string; image: string };
 type SystemStats = {
   ram: { total_mb: number; used_mb: number; percent: number };
   disk: { total: string; used: string; free: string; percent: string };
+};
+type ClaudeUsage = {
+  sessions: number;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  estimated_cost_usd: number;
+  models: Record<string, number>;
+  sessions_by_day: Record<string, number>;
 };
 
 // ─── STATUS DOT ─────────────────────────────────────────────────────────────
@@ -129,17 +138,20 @@ export default function MissionControl() {
   const [services, setServices] = useState<Service[]>([]);
   const [containers, setContainers] = useState<ContainerItem[]>([]);
   const [system, setSystem] = useState<SystemStats | null>(null);
+  const [claudeUsage, setClaudeUsage] = useState<ClaudeUsage | null>(null);
   const [lastUpdate, setLastUpdate] = useState("");
 
   const refresh = useCallback(async () => {
-    const [sRes, dRes, syRes] = await Promise.allSettled([
+    const [sRes, dRes, syRes, cuRes] = await Promise.allSettled([
       fetch("/api/aria/dashboard/status").then(r => r.json()),
       fetch("/api/aria/dashboard/docker").then(r => r.json()),
       fetch("/api/aria/dashboard/system").then(r => r.json()),
+      fetch("/api/aria/dashboard/claude-usage").then(r => r.json()),
     ]);
     if (sRes.status === "fulfilled") setServices(sRes.value.services ?? []);
     if (dRes.status === "fulfilled") setContainers(dRes.value.containers ?? []);
     if (syRes.status === "fulfilled") setSystem(syRes.value);
+    if (cuRes.status === "fulfilled") setClaudeUsage(cuRes.value);
     setLastUpdate(new Date().toLocaleTimeString("de-CH"));
   }, []);
 
@@ -172,6 +184,48 @@ export default function MissionControl() {
           </span>
         )}
       </div>
+
+      {/* Claude Usage */}
+      {claudeUsage && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-aria/20 bg-aria/5 backdrop-blur overflow-hidden"
+        >
+          <div className="flex items-center justify-between border-b border-aria/20 px-4 py-2.5">
+            <div className="flex items-center gap-2">
+              <BrainCircuit className="size-3.5 text-aria" />
+              <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-aria">Claude Code Usage (VPS)</span>
+            </div>
+            <span className="font-mono text-[11px] text-muted-foreground">
+              ~${claudeUsage.estimated_cost_usd.toFixed(4)} USD heute
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-px sm:grid-cols-4 bg-aria/10">
+            {[
+              { label: "Sessions", value: claudeUsage.sessions },
+              { label: "Input Tokens", value: claudeUsage.input_tokens.toLocaleString() },
+              { label: "Output Tokens", value: claudeUsage.output_tokens.toLocaleString() },
+              { label: "Total Tokens", value: claudeUsage.total_tokens.toLocaleString() },
+            ].map((item) => (
+              <div key={item.label} className="bg-card/50 px-4 py-3 space-y-0.5">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{item.label}</p>
+                <p className="font-mono text-lg font-bold text-foreground">{item.value}</p>
+              </div>
+            ))}
+          </div>
+          {Object.keys(claudeUsage.sessions_by_day).length > 0 && (
+            <div className="px-4 py-2.5 flex items-center gap-4 flex-wrap">
+              {Object.entries(claudeUsage.sessions_by_day).map(([day, count]) => (
+                <span key={day} className="font-mono text-[10px] text-muted-foreground">
+                  {day}: <span className="text-aria font-semibold">{count} sessions</span>
+                </span>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
