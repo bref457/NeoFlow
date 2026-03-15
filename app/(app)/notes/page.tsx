@@ -32,8 +32,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   claude: "bg-green-500/15 text-green-400",
 };
 
-const APP_OPTIONS = ["gartenplaner", "aria", "dishboard", "neoflow"];
-
 export default async function NotesPage({
   searchParams,
 }: {
@@ -45,6 +43,12 @@ export default async function NotesPage({
   const filterApp = String(resolvedSearchParams.app ?? "").trim();
 
   const supabase = await createClient();
+
+  const { data: projects } = await supabase
+    .from("projects")
+    .select("id, name")
+    .is("archived_at", null)
+    .order("name");
 
   let notesQuery = supabase
     .from("notes")
@@ -89,7 +93,7 @@ export default async function NotesPage({
               <select
                 name="category"
                 defaultValue="note"
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-auto"
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-auto"
               >
                 {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
                   <option key={val} value={val}>{label}</option>
@@ -98,11 +102,11 @@ export default async function NotesPage({
               <select
                 name="app_name"
                 defaultValue=""
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-auto"
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-auto"
               >
                 <option value="">Kein Projekt</option>
-                {APP_OPTIONS.map((app) => (
-                  <option key={app} value={app}>{app.charAt(0).toUpperCase() + app.slice(1)}</option>
+                {(projects ?? []).map((p) => (
+                  <option key={p.id} value={p.name}>{p.name}</option>
                 ))}
               </select>
               <Input name="source" placeholder="Quelle (optional)" className="sm:flex-1" />
@@ -132,7 +136,7 @@ export default async function NotesPage({
             <select
               name="category"
               defaultValue={filterCategory}
-              className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">Alle Kategorien</option>
               {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
@@ -142,11 +146,11 @@ export default async function NotesPage({
             <select
               name="app"
               defaultValue={filterApp}
-              className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">Alle Projekte</option>
-              {APP_OPTIONS.map((app) => (
-                <option key={app} value={app}>{app.charAt(0).toUpperCase() + app.slice(1)}</option>
+              {(projects ?? []).map((p) => (
+                <option key={p.id} value={p.name}>{p.name}</option>
               ))}
             </select>
             <Button type="submit" variant="outline" className="w-full sm:w-auto">
@@ -187,7 +191,7 @@ export default async function NotesPage({
                     <p className="text-xs text-muted-foreground">{formatDateTimeEU(note.created_at)}</p>
                     <details>
                       <summary className="cursor-pointer text-xs text-muted-foreground">Bearbeiten</summary>
-                      <form action={updateNote} className="mt-2 flex flex-col gap-2 sm:flex-row">
+                      <form action={updateNote} className="mt-2 flex flex-col gap-2">
                         <input type="hidden" name="noteId" value={note.id} />
                         <Input
                           name="content"
@@ -195,11 +199,29 @@ export default async function NotesPage({
                           required
                           minLength={1}
                           maxLength={2000}
-                          className="sm:flex-1"
                         />
-                        <Button type="submit" size="sm" className="sm:w-auto">
-                          Speichern
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                          <select
+                            name="category"
+                            defaultValue={note.category ?? "note"}
+                            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
+                          >
+                            {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
+                              <option key={val} value={val}>{label}</option>
+                            ))}
+                          </select>
+                          <select
+                            name="app_name"
+                            defaultValue={note.app_name ?? ""}
+                            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
+                          >
+                            <option value="">Kein Projekt</option>
+                            {(projects ?? []).map((p) => (
+                              <option key={p.id} value={p.name}>{p.name}</option>
+                            ))}
+                          </select>
+                          <Button type="submit" size="sm">Speichern</Button>
+                        </div>
                       </form>
                     </details>
                   </div>

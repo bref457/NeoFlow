@@ -80,6 +80,8 @@ export async function updateNote(formData: FormData) {
 
   const noteId = String(formData.get("noteId") ?? "");
   const content = String(formData.get("content") ?? "").trim();
+  const category = String(formData.get("category") ?? "note").trim();
+  const app_name = String(formData.get("app_name") ?? "").trim() || null;
 
   if (!noteId || !content) {
     return;
@@ -87,7 +89,11 @@ export async function updateNote(formData: FormData) {
 
   const { error } = await supabase
     .from("notes")
-    .update({ content })
+    .update({
+      content,
+      category: ["note", "feedback", "brainstorming", "infra", "claude"].includes(category) ? category : "note",
+      app_name: app_name || null,
+    })
     .eq("id", noteId)
     .eq("user_id", user.id)
     .is("archived_at", null);
