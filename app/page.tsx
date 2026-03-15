@@ -158,7 +158,7 @@ export default async function Home() {
             </span>
           </h1>
           <p className="text-base leading-relaxed text-muted-foreground sm:text-lg max-w-xl">
-            Ich bin Fabio — Solo-Developer aus der Schweiz. Ich entwickle kleine,
+            Ich bin Neo — Solo-Developer aus der Schweiz. Ich entwickle kleine,
             fokussierte Web-Apps: von der Idee bis zum Deploy auf eigenem Server.
           </p>
         </section>
