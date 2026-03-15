@@ -25,9 +25,6 @@ export default function LoginPage({
             <Button type="submit" className="w-full bg-aria text-black hover:bg-aria/90 font-semibold btn-shimmer">Einloggen</Button>
           </form>
 
-          <p className="mt-4 text-sm text-muted-foreground">
-            Noch kein Konto? <Link className="underline" href="/signup">Registrieren</Link>
-          </p>
         </CardContent>
       </Card>
     </div>
