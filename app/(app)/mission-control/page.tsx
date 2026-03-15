@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-
+import { motion } from "framer-motion";
+import { Server, HardDrive, Container, Activity } from "lucide-react";
 
 type Service = { name: string; status: string; latency_ms: number | null };
-type Container = { name: string; status: string; uptime: string; image: string };
+type ContainerItem = { name: string; status: string; uptime: string; image: string };
 type SystemStats = {
   ram: { total_mb: number; used_mb: number; percent: number };
   disk: { total: string; used: string; free: string; percent: string };
 };
 
+// ─── STATUS DOT ─────────────────────────────────────────────────────────────
 function StatusDot({ status }: { status: string }) {
   const colors: Record<string, string> = {
     online: "bg-aria shadow-[0_0_6px_var(--color-aria)]",
@@ -18,42 +20,117 @@ function StatusDot({ status }: { status: string }) {
     stopped: "bg-muted-foreground",
     degraded: "bg-yellow-500",
   };
+  return <span className={`inline-block size-2 rounded-full flex-shrink-0 ${colors[status] ?? "bg-muted"}`} />;
+}
+
+// ─── KPI CARD ────────────────────────────────────────────────────────────────
+function KpiCard({
+  label, value, display, sub, percent, icon: Icon, index,
+}: {
+  label: string;
+  value: number;
+  display: string;
+  sub: string;
+  percent: number;
+  icon: React.ElementType;
+  index: number;
+}) {
+  const color = percent >= 80 ? "bg-red-500" : percent >= 60 ? "bg-yellow-500" : "bg-aria";
+
   return (
-    <span className={`inline-block size-2 rounded-full flex-shrink-0 ${colors[status] ?? "bg-muted"}`} />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08, type: "spring", stiffness: 300, damping: 30 }}
+      className="relative overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur hover:border-aria/30 transition-colors duration-300"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-aria/5 to-transparent pointer-events-none" />
+      <div className="p-5 space-y-4">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold text-foreground">{display}</span>
+              <span className="text-xs text-muted-foreground">{sub}</span>
+            </div>
+          </div>
+          <motion.div
+            className="flex size-10 items-center justify-center rounded-xl border border-aria/20 bg-aria/10"
+            whileHover={{ scale: 1.08 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          >
+            <Icon className="size-5 text-aria" />
+          </motion.div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-[10px]">
+            <span className="text-muted-foreground">Usage</span>
+            <span className="font-mono font-medium">{percent.toFixed(1)}%</span>
+          </div>
+          <div className="relative h-1.5 rounded-full bg-muted/50 overflow-hidden border border-border/30">
+            <motion.div
+              className={`absolute inset-y-0 left-0 rounded-full ${color}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${percent}%` }}
+              transition={{ type: "spring", stiffness: 80, damping: 20, delay: index * 0.08 + 0.3 }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Sparkline */}
+        <div className="flex items-end gap-0.5 h-5 pt-1 border-t border-border/30">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="flex-1 rounded-t"
+              style={{ backgroundColor: `rgba(74,222,128,${0.15 + Math.random() * 0.35})` }}
+              initial={{ height: 0 }}
+              animate={{ height: `${20 + Math.random() * 80}%` }}
+              transition={{ delay: index * 0.08 + i * 0.03, type: "spring", stiffness: 300, damping: 25 }}
+            />
+          ))}
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
-function Card({ title, badge, children }: { title: string; badge?: string | number; children: React.ReactNode }) {
+// ─── SECTION CARD ────────────────────────────────────────────────────────────
+function SectionCard({ title, badge, children }: { title: string; badge?: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-card/50 backdrop-blur overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border/40 px-4 py-2">
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{title}</span>
-        {badge !== undefined && (
-          <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[11px] text-muted-foreground">{badge}</span>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="rounded-xl border border-border/60 bg-card/50 backdrop-blur overflow-hidden"
+    >
+      <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
+        <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-foreground/60">{title}</span>
+        {badge && (
+          <span className="rounded-full border border-aria/20 bg-aria/10 px-2 py-0.5 font-mono text-[11px] text-aria">{badge}</span>
         )}
       </div>
-      <div className="max-h-80 overflow-y-auto p-4">{children}</div>
-    </div>
+      <div className="p-4">{children}</div>
+    </motion.div>
   );
 }
 
-function Empty({ text = "Keine Daten" }: { text?: string }) {
-  return <p className="text-sm italic text-muted-foreground">{text}</p>;
-}
-
-function ProgressBar({ percent, color = "bg-aria" }: { percent: number; color?: string }) {
-  return (
-    <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-      <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${Math.min(percent, 100)}%` }} />
-    </div>
-  );
-}
-
+// ─── MAIN ────────────────────────────────────────────────────────────────────
 export default function MissionControl() {
   const [services, setServices] = useState<Service[]>([]);
-  const [containers, setContainers] = useState<Container[]>([]);
+  const [containers, setContainers] = useState<ContainerItem[]>([]);
   const [system, setSystem] = useState<SystemStats | null>(null);
   const [lastUpdate, setLastUpdate] = useState("");
+
   const refresh = useCallback(async () => {
     const [sRes, dRes, syRes] = await Promise.allSettled([
       fetch("/api/aria/dashboard/status").then(r => r.json()),
@@ -74,79 +151,133 @@ export default function MissionControl() {
 
   const online = services.filter(s => s.status === "online").length;
   const running = containers.filter(c => c.status === "running").length;
+  const diskPercent = system ? parseFloat(system.disk.percent) : 0;
 
   return (
-    <div className="space-y-4 p-4 sm:p-6">
+    <div className="space-y-5 p-4 sm:p-6">
+
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="font-mono text-lg font-semibold text-aria">⚡ Mission Control</h1>
+        <div className="flex items-center gap-2.5">
+          <motion.div
+            className="size-2.5 rounded-full bg-aria"
+            animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <h1 className="font-mono text-base font-bold text-foreground">Mission Control</h1>
+        </div>
         {lastUpdate && (
-          <span className="text-xs text-muted-foreground">Aktualisiert: {lastUpdate}</span>
+          <span className="font-mono text-[11px] text-muted-foreground">
+            Aktualisiert: {lastUpdate}
+          </span>
         )}
       </div>
 
-      {/* VPS System Stats */}
-      {system && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl border border-border/60 bg-card/50 p-3 space-y-1.5">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">RAM</p>
-            <p className="text-lg font-semibold">{system.ram.percent}%</p>
-            <ProgressBar percent={system.ram.percent} color={system.ram.percent > 80 ? "bg-red-500" : "bg-aria"} />
-            <p className="text-[11px] text-muted-foreground">{system.ram.used_mb} / {system.ram.total_mb} MB</p>
-          </div>
-          <div className="rounded-xl border border-border/60 bg-card/50 p-3 space-y-1.5">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Disk</p>
-            <p className="text-lg font-semibold">{system.disk.percent}</p>
-            <ProgressBar percent={parseFloat(system.disk.percent)} color={parseFloat(system.disk.percent) > 80 ? "bg-red-500" : "bg-aria"} />
-            <p className="text-[11px] text-muted-foreground">{system.disk.used} / {system.disk.total}</p>
-          </div>
-          <div className="rounded-xl border border-border/60 bg-card/50 p-3 space-y-1.5">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Container</p>
-            <p className="text-lg font-semibold">{running}<span className="text-sm text-muted-foreground">/{containers.length}</span></p>
-            <ProgressBar percent={containers.length ? running / containers.length * 100 : 0} color="bg-green-500" />
-            <p className="text-[11px] text-muted-foreground">{running} running</p>
-          </div>
-          <div className="rounded-xl border border-border/60 bg-card/50 p-3 space-y-1.5">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Services</p>
-            <p className="text-lg font-semibold">{online}<span className="text-sm text-muted-foreground">/{services.length}</span></p>
-            <ProgressBar percent={services.length ? online / services.length * 100 : 0} color="bg-aria" />
-            <p className="text-[11px] text-muted-foreground">{online} online</p>
-          </div>
-        </div>
-      )}
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {system && (
+          <>
+            <KpiCard
+              index={0} label="RAM" icon={Activity}
+              value={system.ram.percent} display={`${system.ram.percent}%`}
+              sub={`${system.ram.used_mb}/${system.ram.total_mb} MB`}
+              percent={system.ram.percent}
+            />
+            <KpiCard
+              index={1} label="Disk" icon={HardDrive}
+              value={diskPercent} display={system.disk.percent}
+              sub={`${system.disk.used} / ${system.disk.total}`}
+              percent={diskPercent}
+            />
+          </>
+        )}
+        <KpiCard
+          index={2} label="Container" icon={Container}
+          value={running} display={`${running}/${containers.length}`}
+          sub="running"
+          percent={containers.length ? (running / containers.length) * 100 : 0}
+        />
+        <KpiCard
+          index={3} label="Services" icon={Server}
+          value={online} display={`${online}/${services.length}`}
+          sub="online"
+          percent={services.length ? (online / services.length) * 100 : 0}
+        />
+      </div>
 
       {/* Services */}
-      <Card title="Services" badge={services.length ? `${online}/${services.length}` : undefined}>
-        {services.length === 0 ? <Empty text="Lade..." /> : (
+      <SectionCard title="Services" badge={services.length ? `${online}/${services.length}` : undefined}>
+        {services.length === 0 ? (
+          <p className="text-sm italic text-muted-foreground">Lade...</p>
+        ) : (
           <div className="flex flex-wrap gap-2">
-            {services.map(s => (
-              <div key={s.name} className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/50 px-3 py-2 text-sm">
+            {services.map((s, i) => (
+              <motion.div
+                key={s.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.04 }}
+                className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/50 px-3 py-2 text-sm hover:border-border/90 transition-colors"
+              >
                 <StatusDot status={s.status} />
                 <span>{s.name}</span>
                 {s.latency_ms != null && (
-                  <span className="ml-auto text-xs text-muted-foreground">{s.latency_ms}ms</span>
+                  <span className="ml-1 font-mono text-[10px] text-muted-foreground">{s.latency_ms}ms</span>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
-      </Card>
+      </SectionCard>
 
       {/* Docker Container */}
-      <Card title="Docker Container" badge={containers.length ? `${running}/${containers.length}` : undefined}>
-        {containers.length === 0 ? <Empty text="Lade..." /> : (
+      <SectionCard title="Docker Container" badge={containers.length ? `${running}/${containers.length}` : undefined}>
+        {containers.length === 0 ? (
+          <p className="text-sm italic text-muted-foreground">Lade...</p>
+        ) : (
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-            {containers.map(c => (
-              <div key={c.name} className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/50 px-3 py-2 text-sm">
+            {containers.map((c, i) => (
+              <motion.div
+                key={c.name}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.03 }}
+                className="flex items-center gap-2.5 rounded-lg border border-border/60 bg-background/50 px-3 py-2 hover:border-border/90 transition-colors"
+              >
                 <StatusDot status={c.status} />
-                <span className="font-mono text-xs">{c.name}</span>
-                <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded ${c.status === "running" ? "bg-green-500/10 text-green-500" : "bg-muted text-muted-foreground"}`}>
+                <span className="flex-1 font-mono text-xs">{c.name}</span>
+                <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded border ${
+                  c.status === "running"
+                    ? "border-aria/20 bg-aria/10 text-aria"
+                    : "border-border/40 bg-muted/30 text-muted-foreground"
+                }`}>
                   {c.status}
                 </span>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
-      </Card>
+      </SectionCard>
+
+      {/* Status Bar */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="flex items-center justify-between rounded-xl border border-border/40 bg-card/30 px-4 py-2.5"
+      >
+        <div className="flex items-center gap-2">
+          <motion.div
+            className="size-2 rounded-full bg-aria"
+            animate={{ opacity: [1, 0.3, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <span className="text-xs text-muted-foreground">
+            {online === services.length && services.length > 0 ? "All systems operational" : "Checking systems..."}
+          </span>
+        </div>
+        <span className="font-mono text-[10px] text-muted-foreground">Auto-refresh: 30s</span>
+      </motion.div>
 
     </div>
   );
