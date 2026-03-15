@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_PROJECT_COLOR, normalizeProjectColor } from "@/lib/project-colors";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { MagicCard } from "@/components/ui/magic-card";
 
 type ProjectRow = {
   id: string;
@@ -109,7 +112,7 @@ export default async function DashboardPage() {
         <Card className="border-border/70 shadow-sm">
           <CardHeader className="pb-2">
             <CardDescription>Projekte</CardDescription>
-            <CardTitle className="text-3xl">{totalProjects}</CardTitle>
+            <CardTitle className="text-3xl"><NumberTicker value={totalProjects} /></CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">Aktive Projekt-Container.</p>
@@ -119,7 +122,7 @@ export default async function DashboardPage() {
         <Card className="border-border/70 shadow-sm">
           <CardHeader className="pb-2">
             <CardDescription>Offene Tasks</CardDescription>
-            <CardTitle className="text-3xl">{openTasks}</CardTitle>
+            <CardTitle className="text-3xl"><NumberTicker value={openTasks} /></CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">Noch nicht erledigt.</p>
@@ -129,7 +132,7 @@ export default async function DashboardPage() {
         <Card className="border-border/70 shadow-sm">
           <CardHeader className="pb-2">
             <CardDescription>Erledigt</CardDescription>
-            <CardTitle className="text-3xl">{completedTasks}</CardTitle>
+            <CardTitle className="text-3xl"><NumberTicker value={completedTasks} /></CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">{completionRate}% Abschlussquote.</p>
@@ -139,7 +142,7 @@ export default async function DashboardPage() {
         <Card className="border-border/70 shadow-sm">
           <CardHeader className="pb-2">
             <CardDescription>Notes</CardDescription>
-            <CardTitle className="text-3xl">{notesCount}</CardTitle>
+            <CardTitle className="text-3xl"><NumberTicker value={notesCount} /></CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">{tasksCreatedToday} Tasks heute erstellt.</p>
@@ -147,7 +150,8 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="border-border/70 shadow-sm">
+      <Card className="relative overflow-hidden border-border/70 shadow-sm">
+        <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
         <CardHeader>
           <CardTitle>Fortschritt gesamt</CardTitle>
           <CardDescription>
@@ -175,10 +179,11 @@ export default async function DashboardPage() {
               const projectColor = normalizeProjectColor(project.color);
 
               return (
-                <div
-                  key={project.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
-                  style={{ borderLeftWidth: "5px", borderLeftColor: projectColor }}
+                <div key={project.id} className="overflow-hidden rounded-lg" style={{ borderLeftWidth: "4px", borderLeftColor: projectColor }}>
+                <MagicCard
+                  className="flex flex-wrap items-center justify-between gap-3 p-3"
+                  gradientColor="#1a1a2e"
+                  gradientOpacity={0.6}
                 >
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
@@ -195,6 +200,7 @@ export default async function DashboardPage() {
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/projects/${project.id}`}>Öffnen</Link>
                   </Button>
+                </MagicCard>
                 </div>
               );
             })

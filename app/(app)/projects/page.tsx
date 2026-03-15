@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_PROJECT_COLOR, PROJECT_PASTEL_COLORS, normalizeProjectColor } from "@/lib/project-colors";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { MagicCard } from "@/components/ui/magic-card";
 
 type ProjectRow = {
   id: string;
@@ -85,7 +87,8 @@ export default async function ProjectsPage({
         <p className="text-sm text-muted-foreground">Verwalte deine Projekte und ihre Tasks.</p>
       </div>
 
-      <Card className="border-border/70 shadow-sm">
+      <Card className="relative overflow-hidden border-border/70 shadow-sm">
+        <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
         <CardHeader>
           <CardTitle>Neues Projekt</CardTitle>
           <CardDescription>Erstelle ein Projekt als Container für deine Tasks.</CardDescription>

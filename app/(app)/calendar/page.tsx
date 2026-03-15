@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DEFAULT_PROJECT_COLOR, normalizeProjectColor } from "@/lib/project-colors";
+import { BorderBeam } from "@/components/ui/border-beam";
 import {
   CALENDAR_RECURRENCE_RULES,
   expandCalendarEntryOccurrencesInRange,
@@ -306,7 +307,8 @@ export default async function CalendarPage({
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-border/70 shadow-sm">
+        <Card className="relative overflow-hidden border-border/70 shadow-sm">
+          <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
           <CardHeader>
             <CardTitle>Neuer Termin</CardTitle>
             <CardDescription>Notiz und Zeit für {formatDateEU(selectedDate)} eintragen.</CardDescription>

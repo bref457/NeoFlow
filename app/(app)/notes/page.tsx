@@ -4,6 +4,7 @@ import { formatDateTimeEU } from "@/lib/date-format";
 import { createNote, deleteNote, updateNote } from "./actions";
 import { DeleteNoteForm } from "./delete-note-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -81,7 +82,8 @@ export default async function NotesPage({
         <p className="text-sm text-muted-foreground">Erstelle und verwalte deine Notizen.</p>
       </div>
 
-      <Card className="border-border/70 shadow-sm">
+      <Card className="relative overflow-hidden border-border/70 shadow-sm">
+        <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
         <CardHeader>
           <CardTitle>Neue Notiz</CardTitle>
           <CardDescription>Füge schnell eine weitere Notiz hinzu.</CardDescription>

@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_PROJECT_COLOR, normalizeProjectColor } from "@/lib/project-colors";
+import { BorderBeam } from "@/components/ui/border-beam";
 import {
   compareTaskPriority,
   DEFAULT_TASK_PRIORITY,
@@ -205,7 +206,8 @@ export default async function ProjectDetailPage({
         </div>
       </div>
 
-      <Card className="border-border/70 shadow-sm">
+      <Card className="relative overflow-hidden border-border/70 shadow-sm">
+        <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
         <CardHeader>
           <div className="flex items-center justify-between gap-3">
             <CardTitle>Neuer Task</CardTitle>
