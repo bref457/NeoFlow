@@ -6,8 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
+import {
   ExternalLink, Sprout, UtensilsCrossed, MonitorDot,
-  Github, Server, Laptop, MessageSquare, Globe, Lock,
+  Github, Server, Laptop, MessageSquare, Globe, Lock, CheckCircle2,
 } from "lucide-react";
 
 // ─── SPARKLES ───────────────────────────────────────────────────────────────
@@ -114,7 +117,52 @@ const fadeUp = {
   }),
 };
 
+type ProjectKey = "neogarden" | "neodish" | "neoflow";
+
+const PROJECT_DETAILS: Record<ProjectKey, {
+  icon: React.ReactNode;
+  name: string;
+  tagline: string;
+  problem: string;
+  solution: string;
+  features: string[];
+  url?: string;
+  urlLabel?: string;
+}> = {
+  neogarden: {
+    icon: <Sprout className="size-5 text-aria" />,
+    name: "NeoGarden",
+    tagline: "Von der Aussaat bis zur Ernte.",
+    problem: "Du weißt nie mehr was du wann gepflanzt hast, was als nächstes dran ist — und welche Pflanzen eigentlich gut zusammenpassen.",
+    solution: "NeoGarden ist dein digitales Gartenbuch. Du führst ein Anzucht-Tagebuch, planst im Kalender wann gesät oder gepflanzt wird, und ein KI-Assistent beantwortet alle Gartenfragen — von Pflanzabstand bis Schädlingsbekämpfung.",
+    features: ["Anzucht-Tagebuch", "Pflanzkalender", "KI-Gartenberatung", "Privat & ohne Datenweitergabe"],
+    url: "https://garten.neo457.ch",
+    urlLabel: "App öffnen",
+  },
+  neodish: {
+    icon: <UtensilsCrossed className="size-5 text-aria" />,
+    name: "NeoDish",
+    tagline: "Keine Frage mehr: Was essen wir heute?",
+    problem: "Jeden Abend die gleiche Frage: 'Was essen wir heute?' Zutaten fehlen, Rezepte sind überall verstreut, der Einkauf wird zum Chaos.",
+    solution: "NeoDish macht Schluss mit dem Mahlzeiten-Chaos. Du planst die Woche im Voraus, hast alle Rezepte an einem Ort — und die Einkaufsliste erstellt sich automatisch aus deinem Wochenplan.",
+    features: ["Wochenplaner", "Rezept-Verwaltung", "Automatische Einkaufsliste"],
+    url: "https://essen.neo457.ch",
+    urlLabel: "App öffnen",
+  },
+  neoflow: {
+    icon: <MonitorDot className="size-5 text-aria" />,
+    name: "NeoFlow",
+    tagline: "Mein persönliches Kontrollzentrum.",
+    problem: "Wer mehrere Web-Apps, einen eigenen Server und viele Projekte betreibt, verliert schnell den Überblick. Was läuft gerade? Was steht an? Wie viel Ressourcen hat der Server noch?",
+    solution: "NeoFlow ist mein persönliches Command Center. Auf einen Blick: alle laufenden Docker Container, Server-Status, Tasks und Notizen für alle Projekte — plus direkter KI-Chat. Von überall erreichbar, komplett selbst gehostet.",
+    features: ["Mission Control", "Docker & Server Status", "Task- & Notiz-Verwaltung", "ARIA KI-Integration"],
+  },
+};
+
 export default function Home() {
+  const [openDialog, setOpenDialog] = useState<ProjectKey | null>(null);
+  const activeProject = openDialog ? PROJECT_DETAILS[openDialog] : null;
+
   return (
     <>
       <style>{`
@@ -256,6 +304,12 @@ export default function Home() {
                       <span key={t} className="rounded-md border border-border/50 bg-muted/30 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">{t}</span>
                     ))}
                   </div>
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDialog("neogarden"); }}
+                    className="self-start font-mono text-[11px] text-aria/60 transition-colors hover:text-aria"
+                  >
+                    Mehr erfahren →
+                  </button>
                 </div>
               </motion.a>
 
@@ -292,6 +346,12 @@ export default function Home() {
                       <span key={t} className="rounded-md border border-border/50 bg-muted/30 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">{t}</span>
                     ))}
                   </div>
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDialog("neodish"); }}
+                    className="self-start font-mono text-[11px] text-aria/60 transition-colors hover:text-aria"
+                  >
+                    Mehr erfahren →
+                  </button>
                 </div>
               </motion.a>
 
@@ -329,6 +389,12 @@ export default function Home() {
                     {["Mission Control", "Docker", "Self-hosted"].map(t => (
                       <span key={t} className="rounded-md border border-aria/20 bg-aria-dim/50 px-2 py-0.5 font-mono text-[10px] text-aria">{t}</span>
                     ))}
+                    <button
+                      onClick={() => setOpenDialog("neoflow")}
+                      className="font-mono text-[11px] text-aria/60 transition-colors hover:text-aria sm:text-right"
+                    >
+                      Mehr erfahren →
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -425,6 +491,60 @@ export default function Home() {
         </footer>
 
       </div>
+
+      {/* PROJECT DETAIL DIALOG */}
+      <Dialog open={!!openDialog} onOpenChange={(open) => !open && setOpenDialog(null)}>
+        <DialogContent className="max-w-lg">
+          {activeProject && (
+            <>
+              <DialogHeader>
+                <div className="mb-2 flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl border border-aria/30 bg-aria-dim">
+                    {activeProject.icon}
+                  </div>
+                  <div>
+                    <DialogTitle className="text-lg">{activeProject.name}</DialogTitle>
+                    <p className="font-mono text-[11px] text-aria">{activeProject.tagline}</p>
+                  </div>
+                </div>
+                <DialogDescription asChild>
+                  <div className="space-y-4 text-left">
+                    <div className="space-y-1">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Das Problem</p>
+                      <p className="text-sm leading-relaxed text-foreground/80">{activeProject.problem}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Die Lösung</p>
+                      <p className="text-sm leading-relaxed text-foreground/80">{activeProject.solution}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Features</p>
+                      <ul className="space-y-1">
+                        {activeProject.features.map((f) => (
+                          <li key={f} className="flex items-center gap-2 text-sm text-foreground/80">
+                            <CheckCircle2 className="size-3.5 shrink-0 text-aria" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    {activeProject.url && (
+                      <a
+                        href={activeProject.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-aria/30 bg-aria-dim px-4 py-2 font-mono text-xs text-aria transition-colors hover:bg-aria/10"
+                      >
+                        {activeProject.urlLabel} <ExternalLink className="size-3" />
+                      </a>
+                    )}
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
