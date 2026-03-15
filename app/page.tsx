@@ -306,7 +306,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDialog("neogarden"); }}
-                    className="self-start font-mono text-[11px] text-aria/60 transition-colors hover:text-aria"
+                    className="self-start rounded-md border border-aria/20 bg-aria-dim/60 px-3 py-1 font-mono text-[11px] text-aria transition-all hover:border-aria/50 hover:bg-aria/10"
                   >
                     Mehr erfahren →
                   </button>
@@ -348,7 +348,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDialog("neodish"); }}
-                    className="self-start font-mono text-[11px] text-aria/60 transition-colors hover:text-aria"
+                    className="self-start rounded-md border border-aria/20 bg-aria-dim/60 px-3 py-1 font-mono text-[11px] text-aria transition-all hover:border-aria/50 hover:bg-aria/10"
                   >
                     Mehr erfahren →
                   </button>
@@ -392,7 +392,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={() => setOpenDialog("neoflow")}
-                    className="self-start font-mono text-[11px] text-aria/60 transition-colors hover:text-aria"
+                    className="self-start rounded-md border border-aria/20 bg-aria-dim/60 px-3 py-1 font-mono text-[11px] text-aria transition-all hover:border-aria/50 hover:bg-aria/10"
                   >
                     Mehr erfahren →
                   </button>
