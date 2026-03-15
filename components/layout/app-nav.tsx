@@ -57,9 +57,6 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
 
       <Separator className="my-3" />
 
-      <p className="px-2 pb-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-aria">
-        NeoFlow
-      </p>
       {navItems.map((item) => (
         <NavButton key={item.href} {...item} />
       ))}
