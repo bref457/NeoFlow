@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeEU } from "@/lib/date-format";
 import { createNote, deleteNote, updateNote, markNoteDone } from "./actions";
 import { DeleteNoteForm } from "./delete-note-form";
+import { NoteForm } from "@/components/notes/note-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,8 @@ type NoteRow = {
   app_name: string | null;
   source: string | null;
   done: boolean;
+  priority: string | null;
+  due_date: string | null;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -55,7 +58,7 @@ export default async function NotesPage({
 
   let notesQuery = supabase
     .from("notes")
-    .select("id, content, created_at, category, app_name, source, done")
+    .select("id, content, created_at, category, app_name, source, done, priority, due_date")
     .is("archived_at", null)
     .eq("done", showDone)
     .order("created_at", { ascending: false });
@@ -92,34 +95,7 @@ export default async function NotesPage({
           <CardDescription>Füge schnell eine weitere Notiz hinzu.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={createNote} className="flex flex-col gap-3">
-            <Input name="content" placeholder="Neue Notiz eingeben..." required minLength={1} maxLength={2000} />
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <select
-                name="category"
-                defaultValue="note"
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-auto"
-              >
-                {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
-                  <option key={val} value={val}>{label}</option>
-                ))}
-              </select>
-              <select
-                name="app_name"
-                defaultValue=""
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-auto"
-              >
-                <option value="">Kein Projekt</option>
-                {(projects ?? []).map((p) => (
-                  <option key={p.id} value={p.name}>{p.name}</option>
-                ))}
-              </select>
-              <Input name="source" placeholder="Quelle (optional)" className="sm:flex-1" />
-              <Button type="submit" className="w-full sm:w-auto">
-                Hinzufügen
-              </Button>
-            </div>
-          </form>
+          <NoteForm action={createNote} projects={projects ?? []} />
         </CardContent>
       </Card>
 
@@ -201,6 +177,12 @@ export default async function NotesPage({
                       )}
                     </div>
                     <p className="whitespace-pre-wrap break-words">{note.content}</p>
+                    {note.category === "task" && (
+                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                        {note.priority && <span>Priorität: <strong>{note.priority}</strong></span>}
+                        {note.due_date && <span>Fällig: <strong>{formatDateTimeEU(note.due_date)}</strong></span>}
+                      </div>
+                    )}
                     <p className="text-xs text-muted-foreground">{formatDateTimeEU(note.created_at)}</p>
                     <details>
                       <summary className="cursor-pointer text-xs text-muted-foreground">Bearbeiten</summary>

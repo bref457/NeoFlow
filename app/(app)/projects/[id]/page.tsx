@@ -4,8 +4,9 @@ import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeEU } from "@/lib/date-format";
 import { createTask, deleteTask, updateTask } from "./actions";
-import { deleteNote } from "@/app/(app)/notes/actions";
+import { createNote, deleteNote, markNoteDone } from "@/app/(app)/notes/actions";
 import { DeleteNoteForm } from "@/app/(app)/notes/delete-note-form";
+import { NoteForm } from "@/components/notes/note-form";
 import { DeleteProjectButton } from "../delete-project-button";
 import { TaskToggleForm } from "./task-toggle-form";
 import { DeleteTaskForm } from "./delete-task-form";
@@ -27,6 +28,9 @@ type NoteRow = {
   created_at: string;
   category: string | null;
   source: string | null;
+  done: boolean;
+  priority: string | null;
+  due_date: string | null;
 };
 
 const NOTE_CATEGORY_LABELS: Record<string, string> = {
@@ -156,7 +160,7 @@ export default async function ProjectDetailPage({
 
   const { data: notesData, error: notesError } = await supabase
     .from("notes")
-    .select("id, content, created_at, category, source")
+    .select("id, content, created_at, category, source, done, priority, due_date")
     .eq("app_name", project!.name)
     .is("archived_at", null)
     .order("created_at", { ascending: false });
@@ -210,36 +214,13 @@ export default async function ProjectDetailPage({
         <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
         <CardHeader>
           <div className="flex items-center justify-between gap-3">
-            <CardTitle>Neuer Task</CardTitle>
+            <CardTitle>Neuer Eintrag</CardTitle>
             <DeleteProjectButton projectId={typedProject.id} redirectTo="/projects" />
           </div>
-          <CardDescription>Füge dem Projekt einen Task hinzu.</CardDescription>
+          <CardDescription>Notiz, Feedback, Task oder Idee zum Projekt hinzufügen.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={createTask} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <input type="hidden" name="projectId" value={typedProject.id} />
-            <Input
-              name="title"
-              placeholder="Task Titel"
-              required
-              minLength={1}
-              maxLength={240}
-              className="sm:min-w-64 sm:flex-1"
-            />
-            <select
-              name="priority"
-              defaultValue={DEFAULT_TASK_PRIORITY}
-              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            >
-              <option value="high">Hoch</option>
-              <option value="medium">Mittel</option>
-              <option value="low">Niedrig</option>
-            </select>
-            <Input name="dueAt" type="datetime-local" className="sm:w-auto" />
-            <Button type="submit" className="w-full sm:w-auto">
-              Hinzufügen
-            </Button>
-          </form>
+          <NoteForm action={createNote} defaultProjectName={typedProject.name} />
         </CardContent>
       </Card>
 
@@ -380,10 +361,23 @@ export default async function ProjectDetailPage({
                           <span className="text-xs text-muted-foreground">von {note.source}</span>
                         )}
                       </div>
-                      <p className="whitespace-pre-wrap break-words">{note.content}</p>
+                      <p className={`whitespace-pre-wrap break-words ${note.done ? "line-through text-muted-foreground" : ""}`}>{note.content}</p>
+                      {note.category === "task" && (
+                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                          {note.priority && <span>Priorität: <strong>{note.priority}</strong></span>}
+                          {note.due_date && <span>Fällig: <strong>{formatDateTimeEU(note.due_date)}</strong></span>}
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground">{formatDateTimeEU(note.created_at)}</p>
                     </div>
-                    <div className="self-end sm:self-auto">
+                    <div className="flex items-center gap-2 self-end sm:self-auto">
+                      <form action={markNoteDone}>
+                        <input type="hidden" name="noteId" value={note.id} />
+                        <input type="hidden" name="done" value={note.done ? "false" : "true"} />
+                        <Button type="submit" variant="outline" size="sm">
+                          {note.done ? "Wieder öffnen" : "Erledigt"}
+                        </Button>
+                      </form>
                       <DeleteNoteForm noteId={note.id} action={deleteNote} />
                     </div>
                   </CardContent>

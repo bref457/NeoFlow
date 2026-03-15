@@ -21,13 +21,19 @@ export async function createNote(formData: FormData) {
   const category = String(formData.get("category") ?? "note").trim();
   const app_name = String(formData.get("app_name") ?? "").trim() || null;
   const source = String(formData.get("source") ?? "").trim() || null;
+  const priority = String(formData.get("priority") ?? "").trim() || null;
+  const due_date = String(formData.get("due_date") ?? "").trim() || null;
+
+  const validCategories = ["note", "feedback", "brainstorming", "infra", "claude", "task"];
 
   const { error } = await supabase.from("notes").insert({
     user_id: user.id,
     content,
-    category: ["note", "feedback", "brainstorming", "infra", "claude"].includes(category) ? category : "note",
+    category: validCategories.includes(category) ? category : "note",
     app_name: app_name || null,
     source: source || null,
+    priority: category === "task" && priority ? priority : null,
+    due_date: category === "task" && due_date ? due_date : null,
   });
 
   if (error) {
