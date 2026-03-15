@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot, Terminal, MessageSquareDot } from "lucide-react";
+import { CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot, MessageSquareDot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -46,12 +46,6 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
         <Link href="/mission-control" onClick={onNavigate}>
           <MonitorDot className="size-4" />
           Mission Control
-        </Link>
-      </Button>
-      <Button asChild variant={pathname === "/commands" ? "secondary" : "ghost"} className="justify-start">
-        <Link href="/commands" onClick={onNavigate}>
-          <Terminal className="size-4" />
-          Commands
         </Link>
       </Button>
 
