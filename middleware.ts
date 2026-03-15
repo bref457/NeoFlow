@@ -25,12 +25,7 @@ export async function middleware(request: NextRequest) {
   );
 
   // WICHTIG: nicht entfernen — hält Session stabil
-  const { data: { user } } = await supabase.auth.getUser();
-
-  // Eingeloggter User auf Landing Page → direkt zum Dashboard
-  if (user && request.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
