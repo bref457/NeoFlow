@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,7 @@ import {
 const projects = [
   {
     index: "01",
-    name: "Gartenplaner",
+    name: "NeoGarden",
     icon: Sprout,
     tagline: "Von der Aussaat bis zur Ernte.",
     description:
@@ -29,7 +30,7 @@ const projects = [
   },
   {
     index: "02",
-    name: "Dishboard",
+    name: "NeoDish",
     icon: UtensilsCrossed,
     tagline: "Keine Frage mehr: Was essen wir heute?",
     description:
@@ -102,9 +103,9 @@ export default async function Home() {
 
       {/* ── HEADER ── */}
       <header className="sticky top-0 z-50 border-b border-border/30 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:px-8">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5 sm:px-8">
           <div className="flex items-center gap-2.5">
-            <span className="size-1.5 rounded-full bg-aria animate-pulse" />
+            <Image src="/logo-n-white.png" alt="NEO457 Logo" width={28} height={28} className="opacity-90" />
             <span className="font-mono text-sm font-bold tracking-[0.18em] text-aria">
               neo457.ch
             </span>
@@ -143,7 +144,7 @@ export default async function Home() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 sm:px-8">
+      <main className="mx-auto max-w-7xl px-5 sm:px-8">
 
         {/* ── HERO ── */}
         <section className="pt-20 pb-20 sm:pt-28 sm:pb-24 max-w-3xl">
@@ -310,8 +311,11 @@ export default async function Home() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-border/30">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 text-xs text-muted-foreground sm:px-8">
-          <span className="font-mono font-semibold tracking-widest text-aria/70">neo457.ch</span>
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5 text-xs text-muted-foreground sm:px-8">
+          <div className="flex items-center gap-2">
+            <Image src="/logo-n-white.png" alt="NEO457" width={20} height={20} className="opacity-60" />
+            <span className="font-mono font-semibold tracking-widest text-aria/70">neo457.ch</span>
+          </div>
           <a
             href="https://github.com/bref457"
             target="_blank"
