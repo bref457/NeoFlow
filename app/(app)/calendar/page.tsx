@@ -235,7 +235,7 @@ export default async function CalendarPage({
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Calendar</h1>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Kalender</h1>
         <p className="text-sm text-muted-foreground">Notizen mit Datum und Uhrzeit planen.</p>
         <p className="text-xs text-muted-foreground">
           Dieser Monat: {monthEntryCount} Kalendereinträge, {monthDueTaskCount} fällige Tasks
@@ -317,7 +317,7 @@ export default async function CalendarPage({
               <select
                 name="recurrenceRule"
                 defaultValue="none"
-                className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               >
                 {CALENDAR_RECURRENCE_RULES.map((rule) => (
                   <option key={rule} value={rule}>
@@ -334,7 +334,7 @@ export default async function CalendarPage({
                 name="note"
                 placeholder="Notiz (optional)"
                 maxLength={3000}
-                className="flex min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               />
               <Button type="submit">Eintrag speichern</Button>
             </form>
@@ -387,7 +387,7 @@ export default async function CalendarPage({
                     <select
                       name="recurrenceRule"
                       defaultValue={entry.recurrence_rule}
-                      className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                     >
                       {CALENDAR_RECURRENCE_RULES.map((rule) => (
                         <option key={rule} value={rule}>
@@ -409,7 +409,7 @@ export default async function CalendarPage({
                       defaultValue={entry.note ?? ""}
                       placeholder="Notiz (optional)"
                       maxLength={3000}
-                      className="flex min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                      className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                     />
                     <Button type="submit" size="sm">
                       Speichern
