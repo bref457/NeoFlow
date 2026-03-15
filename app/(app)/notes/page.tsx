@@ -126,7 +126,7 @@ export default async function NotesPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <form method="get" className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Input
               name="q"
               placeholder="Suchbegriff..."
