@@ -4,6 +4,8 @@ import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeEU } from "@/lib/date-format";
 import { createTask, deleteTask, updateTask } from "./actions";
+import { deleteNote } from "@/app/(app)/notes/actions";
+import { DeleteNoteForm } from "@/app/(app)/notes/delete-note-form";
 import { DeleteProjectButton } from "../delete-project-button";
 import { TaskToggleForm } from "./task-toggle-form";
 import { DeleteTaskForm } from "./delete-task-form";
@@ -17,6 +19,30 @@ import {
   normalizeTaskPriority,
   type TaskPriority,
 } from "@/lib/task-priority";
+
+type NoteRow = {
+  id: string;
+  content: string;
+  created_at: string;
+  category: string | null;
+  source: string | null;
+};
+
+const NOTE_CATEGORY_LABELS: Record<string, string> = {
+  note: "Notiz",
+  feedback: "Feedback",
+  brainstorming: "Brainstorming",
+  infra: "Infra",
+  claude: "Claude",
+};
+
+const NOTE_CATEGORY_COLORS: Record<string, string> = {
+  note: "bg-muted text-muted-foreground",
+  feedback: "bg-blue-500/15 text-blue-400",
+  brainstorming: "bg-purple-500/15 text-purple-400",
+  infra: "bg-orange-500/15 text-orange-400",
+  claude: "bg-green-500/15 text-green-400",
+};
 
 type ProjectRow = {
   id: string;
@@ -126,6 +152,15 @@ export default async function ProjectDetailPage({
 
   const { data: tasksData, error: tasksError } = await tasksQuery;
   if (tasksError) throw new Error(tasksError.message);
+
+  const { data: notesData, error: notesError } = await supabase
+    .from("notes")
+    .select("id, content, created_at, category, source")
+    .eq("app_name", project!.name)
+    .is("archived_at", null)
+    .order("created_at", { ascending: false });
+  if (notesError) throw new Error(notesError.message);
+  const notes = (notesData ?? []) as NoteRow[];
 
   const tasks = ((tasksData ?? []) as TaskRow[]).map((task) => ({
     ...task,
@@ -322,6 +357,45 @@ export default async function ProjectDetailPage({
             </CardContent>
           </Card>
         )}
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold tracking-tight">Notizen</h2>
+        <div className="grid gap-4">
+          {notes.length ? (
+            notes.map((note) => {
+              const cat = note.category ?? "note";
+              const badgeClass = NOTE_CATEGORY_COLORS[cat] ?? NOTE_CATEGORY_COLORS.note;
+              return (
+                <Card key={note.id} className="border-border/70 shadow-sm">
+                  <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${badgeClass}`}>
+                          {NOTE_CATEGORY_LABELS[cat] ?? cat}
+                        </span>
+                        {note.source && (
+                          <span className="text-xs text-muted-foreground">von {note.source}</span>
+                        )}
+                      </div>
+                      <p className="whitespace-pre-wrap break-words">{note.content}</p>
+                      <p className="text-xs text-muted-foreground">{formatDateTimeEU(note.created_at)}</p>
+                    </div>
+                    <div className="self-end sm:self-auto">
+                      <DeleteNoteForm noteId={note.id} action={deleteNote} />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
+          ) : (
+            <Card className="border-dashed">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">Keine Notizen für dieses Projekt vorhanden.</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
