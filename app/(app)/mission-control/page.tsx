@@ -165,25 +165,6 @@ export default function MissionControl() {
       </Card>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Bot Aktivität */}
-        <Card title="Bot Aktivität" badge={logs.length}>
-          {logs.length === 0 ? <Empty text="Keine Einträge" /> : (
-            <div className="space-y-3">
-              {logs.map((l, i) => (
-                <div key={i} className="border-b border-border/40 pb-3 last:border-0 last:pb-0">
-                  <div className="mb-1 flex gap-2 text-[11px] text-muted-foreground">
-                    <span className={l.role === "user" ? "text-blue-400" : "text-aria"}>{l.role.toUpperCase()}</span>
-                    <span>·</span>
-                    <span>{l.ts}</span>
-                  </div>
-                  <p className="text-sm leading-snug">
-                    {l.content.length > 200 ? l.content.slice(0, 200) + "…" : l.content}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
 
         {/* Security Scans */}
         <Card title="Security Scans" badge={scans.length}>

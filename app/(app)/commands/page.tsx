@@ -11,18 +11,31 @@ type Section = {
 
 const sections: Section[] = [
   {
-    title: "SSH Verbindungen",
+    title: "Remote Entwicklung",
     items: [
-      { label: "VPS verbinden", cmd: "ssh -i ~/.ssh/aria_vps root@162.55.209.62" },
+      { label: "VS Code im Browser", cmd: "https://vscode.neo457.ch", note: "Claude Code Extension verfügbar" },
+      { label: "VPS verbinden (SSH)", cmd: "ssh -i ~/.ssh/aria_vps root@162.55.209.62" },
       {
-        label: "n8n öffnen (WireGuard)",
-        cmd: "ssh -i ~/.ssh/aria_vps -L 5678:localhost:5678 root@162.55.209.62",
-        note: "Dann http://localhost:5678 öffnen",
-      },
-      {
-        label: "Open WebUI öffnen (WireGuard)",
+        label: "Open WebUI öffnen",
         cmd: "ssh -i ~/.ssh/aria_vps -L 8080:localhost:8080 root@162.55.209.62",
         note: "Dann http://localhost:8080 öffnen",
+      },
+    ],
+  },
+  {
+    title: "Deploy",
+    items: [
+      {
+        label: "Gartenplaner deployen",
+        cmd: "ssh -i ~/.ssh/aria_vps root@162.55.209.62 \"cd /opt/gartenplaner && git pull && docker compose up -d --build\"",
+      },
+      {
+        label: "Dishboard deployen",
+        cmd: "ssh -i ~/.ssh/aria_vps root@162.55.209.62 \"cd /opt/dishboard && git pull && docker compose up -d --build\"",
+      },
+      {
+        label: "ARIA deployen",
+        cmd: "ssh -i ~/.ssh/aria_vps root@162.55.209.62 \"cd /opt/aria && docker compose up -d --build\"",
       },
     ],
   },
@@ -31,27 +44,15 @@ const sections: Section[] = [
     items: [
       { label: "Bot Logs", cmd: "cd /opt/aria && docker compose logs -f aria-bot" },
       { label: "API Logs", cmd: "cd /opt/aria && docker compose logs -f aria-api" },
-      { label: "Alle Dienste neustarten", cmd: "cd /opt/aria && docker compose restart" },
-      {
-        label: "Bot nach Code-Änderung deployen",
-        cmd: "cd /opt/aria && docker compose build aria-bot && docker compose up -d aria-bot",
-      },
-    ],
-  },
-  {
-    title: "AROC (KI-Coding-Agent)",
-    items: [
-      { label: "Status prüfen", cmd: "systemctl status aroc" },
-      { label: "Neustarten", cmd: "systemctl restart aroc" },
-      { label: "Logs live", cmd: "journalctl -u aroc -f" },
-      { label: "n8n-Tools anzeigen", cmd: "mcporter list n8n" },
-      { label: "Telegram", cmd: "@ario_457_bot", note: "Coding-Aufgaben, n8n-Automationen, Shell" },
+      { label: "Alle Container anzeigen", cmd: "docker ps -a" },
+      { label: "Alle ARIA-Dienste neustarten", cmd: "cd /opt/aria && docker compose restart" },
     ],
   },
   {
     title: "Claude Code",
     items: [
       { label: "Nutzung & Limits anzeigen", cmd: "npx ccusage" },
+      { label: "Claude Code auf VPS starten", cmd: "ssh -i ~/.ssh/aria_vps root@162.55.209.62 \"claude\"" },
     ],
   },
   {
@@ -99,7 +100,7 @@ export default function CommandsPage() {
     <div className="space-y-8">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Commands</h1>
-        <p className="text-sm text-muted-foreground">SSH, Docker, Claude Code & Telegram Referenz.</p>
+        <p className="text-sm text-muted-foreground">SSH, Docker, Deploy & Telegram Referenz.</p>
       </div>
 
       {sections.map((section) => (

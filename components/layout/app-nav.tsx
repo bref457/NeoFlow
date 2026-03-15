@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot, Terminal, MessageSquareDot } from "lucide-react";
+import { CalendarDays, FolderKanban, LayoutDashboard, NotebookPen, Trash2, MonitorDot, Terminal, MessageSquareDot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -42,12 +42,6 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
 
   return (
     <nav className={cn("flex flex-col gap-1", className)} aria-label="Hauptnavigation">
-      <Button asChild variant={pathname === "/chat" ? "secondary" : "ghost"} className="justify-start">
-        <Link href="/chat" onClick={onNavigate}>
-          <Bot className="size-4" />
-          ARIA Chat
-        </Link>
-      </Button>
       <Button asChild variant={pathname === "/commands" ? "secondary" : "ghost"} className="justify-start">
         <Link href="/commands" onClick={onNavigate}>
           <Terminal className="size-4" />
