@@ -387,7 +387,7 @@ export default function Home() {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {["Mission Control", "Docker", "Self-hosted"].map(t => (
-                      <span key={t} className="rounded-md border border-aria/20 bg-aria-dim/50 px-2 py-0.5 font-mono text-[10px] text-aria">{t}</span>
+                      <span key={t} className="rounded-md border border-border/50 bg-muted/30 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">{t}</span>
                     ))}
                   </div>
                   <button
