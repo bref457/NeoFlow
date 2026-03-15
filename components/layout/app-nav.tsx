@@ -42,16 +42,16 @@ export function AppNav({ className, onNavigate }: AppNavProps) {
 
   return (
     <nav className={cn("flex flex-col gap-1", className)} aria-label="Hauptnavigation">
-      <Button asChild variant={pathname === "/commands" ? "secondary" : "ghost"} className="justify-start">
-        <Link href="/commands" onClick={onNavigate}>
-          <Terminal className="size-4" />
-          Commands
-        </Link>
-      </Button>
       <Button asChild variant={pathname === "/mission-control" ? "secondary" : "ghost"} className="justify-start">
         <Link href="/mission-control" onClick={onNavigate}>
           <MonitorDot className="size-4" />
           Mission Control
+        </Link>
+      </Button>
+      <Button asChild variant={pathname === "/commands" ? "secondary" : "ghost"} className="justify-start">
+        <Link href="/commands" onClick={onNavigate}>
+          <Terminal className="size-4" />
+          Commands
         </Link>
       </Button>
 
