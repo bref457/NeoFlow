@@ -2,20 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
-  ExternalLink,
-  Sprout,
-  UtensilsCrossed,
-  MonitorDot,
-  ArrowRight,
-  Github,
-  Server,
-  Laptop,
-  MessageSquare,
-  Globe,
-  Lock,
+  ExternalLink, Sprout, UtensilsCrossed, MonitorDot,
+  Github, Server, Laptop, MessageSquare, Globe, Lock,
 } from "lucide-react";
 
 const stack = [
@@ -23,98 +15,124 @@ const stack = [
   "Docker", "nginx", "Hetzner", "Claude Code",
 ];
 
-const terminalLines = [
-  { prefix: "~", cmd: "ssh root@neo457.ch", delay: 0 },
-  { prefix: "vps", cmd: "docker ps --format 'table {{.Names}}\\t{{.Status}}'", delay: 800 },
-  { prefix: "vps", cmd: "claude  # Mission Control öffnen", delay: 1800 },
-  { prefix: "vps", cmd: "git pull && docker compose up -d --build", delay: 2800 },
+const terminalSequence = [
+  { prefix: "~", cmd: "ssh root@neo457.ch", type: "cmd" },
+  { prefix: "vps", cmd: "docker ps", type: "cmd" },
+  { prefix: "", cmd: "neodish     ↑ running", type: "out" },
+  { prefix: "", cmd: "neogarden   ↑ running", type: "out" },
+  { prefix: "vps", cmd: "claude  # Mission Control", type: "cmd" },
+  { prefix: "vps", cmd: "git pull && docker compose up -d", type: "cmd" },
 ];
 
-function TerminalLine({ prefix, cmd, delay }: { prefix: string; cmd: string; delay: number }) {
-  const [visible, setVisible] = useState(false);
+function TerminalBlock() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [visible, setVisible] = useState(0);
+
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(t);
-  }, [delay]);
+    if (!inView) return;
+    let i = 0;
+    const tick = () => {
+      i++;
+      setVisible(i);
+      if (i < terminalSequence.length) setTimeout(tick, 550);
+    };
+    setTimeout(tick, 200);
+  }, [inView]);
+
   return (
-    <div className={`flex gap-2 transition-all duration-300 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"}`}>
-      <span className="text-aria select-none shrink-0">{prefix} $</span>
-      <span className="text-foreground/80">{cmd}</span>
+    <div ref={ref} className="rounded-2xl border border-border/50 bg-[#0a0a0a] overflow-hidden">
+      <div className="flex items-center gap-2 border-b border-border/30 px-4 py-3">
+        <span className="size-3 rounded-full bg-red-500/70" />
+        <span className="size-3 rounded-full bg-yellow-500/70" />
+        <span className="size-3 rounded-full bg-green-500/70" />
+        <span className="ml-3 font-mono text-[11px] text-muted-foreground">neo@vps:~</span>
+      </div>
+      <div className="p-5 font-mono text-[12px] leading-7 space-y-0.5 min-h-[200px]">
+        {terminalSequence.slice(0, visible).map((line, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.25 }}
+            className="flex gap-2"
+          >
+            {line.prefix && (
+              <span className="text-aria select-none shrink-0">{line.prefix} $</span>
+            )}
+            {!line.prefix && <span className="text-aria/30 select-none shrink-0 pl-4">→</span>}
+            <span className={line.type === "out" ? "text-muted-foreground" : "text-foreground/85"}>
+              {line.cmd}
+            </span>
+          </motion.div>
+        ))}
+        {visible >= terminalSequence.length && (
+          <div className="flex gap-2">
+            <span className="text-aria select-none">vps $</span>
+            <motion.span
+              animate={{ opacity: [1, 0] }}
+              transition={{ duration: 0.8, repeat: Infinity }}
+              className="text-aria"
+            >▋</motion.span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-export default function Home() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+const fadeUp = {
+  hidden: { opacity: 0, y: 22 },
+  show: (i: number) => ({
+    opacity: 1, y: 0,
+    transition: { duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] },
+  }),
+};
 
+export default function Home() {
   return (
     <>
       <style>{`
         @keyframes gradient-shift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+          0%,100%{background-position:0% 50%}50%{background-position:100% 50%}
         }
-        @keyframes border-spin {
-          to { --border-angle: 360deg; }
+        @keyframes float {
+          0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}
         }
-        @keyframes fade-up {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
+        .gradient-text{
+          background:linear-gradient(135deg,#4ade80,#22d3ee,#a78bfa,#4ade80);
+          background-size:300% 300%;
+          -webkit-background-clip:text;
+          -webkit-text-fill-color:transparent;
+          background-clip:text;
+          animation:gradient-shift 5s ease infinite;
         }
-        @keyframes cursor-blink {
-          0%, 100% { opacity: 1; } 50% { opacity: 0; }
+        .card-glow{position:relative;transition:all 0.3s;}
+        .card-glow::before{
+          content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+          background:linear-gradient(135deg,rgba(74,222,128,0),rgba(74,222,128,0));
+          -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+          -webkit-mask-composite:xor;mask-composite:exclude;
+          transition:all 0.3s;opacity:0;
         }
-        .gradient-text {
-          background: linear-gradient(135deg, #4ade80, #22d3ee, #a78bfa, #4ade80);
-          background-size: 300% 300%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: gradient-shift 5s ease infinite;
+        .card-glow:hover::before{
+          background:linear-gradient(135deg,rgba(74,222,128,0.5),rgba(34,211,238,0.25),rgba(167,139,250,0.25));
+          opacity:1;
         }
-        .fade-up { animation: fade-up 0.6s ease both; }
-        .fade-up-1 { animation: fade-up 0.6s ease 0.1s both; }
-        .fade-up-2 { animation: fade-up 0.6s ease 0.2s both; }
-        .fade-up-3 { animation: fade-up 0.6s ease 0.35s both; }
-        .fade-up-4 { animation: fade-up 0.6s ease 0.5s both; }
-        .card-glow {
-          position: relative;
-          transition: all 0.3s;
-        }
-        .card-glow::before {
-          content: '';
-          position: absolute;
-          inset: -1px;
-          border-radius: inherit;
-          padding: 1px;
-          background: linear-gradient(135deg, rgba(74,222,128,0), rgba(74,222,128,0));
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          transition: all 0.3s;
-          opacity: 0;
-        }
-        .card-glow:hover::before {
-          background: linear-gradient(135deg, rgba(74,222,128,0.6), rgba(34,211,238,0.3), rgba(167,139,250,0.3));
-          opacity: 1;
-        }
-        .cursor-blink { animation: cursor-blink 1s step-end infinite; }
       `}</style>
 
       <div className="relative min-h-dvh bg-background text-foreground overflow-hidden">
 
-        {/* Dot-grid */}
+        {/* Backgrounds */}
         <div className="pointer-events-none fixed inset-0 -z-20"
-          style={{ backgroundImage: "radial-gradient(circle, rgba(74,222,128,0.09) 1px, transparent 1px)", backgroundSize: "28px 28px" }}
-        />
+          style={{ backgroundImage: "radial-gradient(circle,rgba(74,222,128,0.08) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_90%_55%_at_50%_-5%,transparent_0%,hsl(var(--background))_65%)]" />
-        <div className="pointer-events-none fixed left-1/2 top-[-12rem] -z-10 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full bg-aria-glow blur-3xl opacity-40" />
-        {/* Side glows */}
-        <div className="pointer-events-none fixed -left-32 top-1/3 -z-10 h-64 w-64 rounded-full bg-aria-glow blur-3xl opacity-20" />
-        <div className="pointer-events-none fixed -right-32 top-2/3 -z-10 h-64 w-64 rounded-full" style={{ background: "radial-gradient(circle, rgba(167,139,250,0.15), transparent)" }} />
+        <div className="pointer-events-none fixed left-1/2 top-[-12rem] -z-10 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full bg-aria-glow blur-3xl opacity-35" />
+        <div className="pointer-events-none fixed -left-32 top-1/3 -z-10 h-64 w-64 rounded-full bg-aria-glow blur-3xl opacity-15" />
+        <div className="pointer-events-none fixed -right-32 top-2/3 -z-10 h-64 w-64 rounded-full blur-3xl opacity-15"
+          style={{ background: "radial-gradient(circle,rgba(167,139,250,0.2),transparent)" }} />
 
-        {/* ── HEADER ── */}
+        {/* HEADER */}
         <header className="sticky top-0 z-50 border-b border-border/30 bg-background/60 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5 sm:px-8">
             <div className="flex items-center gap-2.5">
@@ -136,45 +154,73 @@ export default function Home() {
 
         <main className="mx-auto max-w-7xl px-5 sm:px-8">
 
-          {/* ── HERO ── */}
+          {/* HERO */}
           <section className="pt-20 pb-16 sm:pt-28 sm:pb-20">
             <div className="max-w-4xl space-y-6">
-              <p className="fade-up font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-aria">
+              <motion.p
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-aria"
+              >
                 Solo Developer · Schweiz
-              </p>
-              <h1 className="fade-up-1 text-[clamp(2.8rem,7vw,5.5rem)] font-black leading-[1.05] tracking-tight">
+              </motion.p>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-[clamp(2.8rem,7vw,5.5rem)] font-black leading-[1.05] tracking-tight"
+              >
                 Ich baue Software{" "}
                 <br className="hidden sm:block" />
                 <span className="gradient-text">die ich selbst nutze.</span>
-              </h1>
-              <p className="fade-up-2 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
+              >
                 Ich bin Neo — Solo-Developer aus der Schweiz. Kleine, fokussierte Web-Apps —
                 von der Idee bis zum Deploy auf eigenem Server.
-              </p>
-              <div className="fade-up-3 flex items-center gap-4 pt-2">
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.35 }}
+                className="flex items-center gap-4 pt-2"
+              >
                 <a href="https://github.com/bref457" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 rounded-lg border border-border/50 bg-muted/20 px-4 py-2 font-mono text-xs text-muted-foreground transition-all hover:border-aria/40 hover:text-foreground">
                   <Github className="size-3.5" />
                   github.com/bref457
                   <ExternalLink className="size-3" />
                 </a>
-              </div>
+              </motion.div>
             </div>
           </section>
 
-          {/* ── BENTO GRID ── */}
-          <section className="fade-up-4 pb-16">
-            <div className="flex items-center gap-4 mb-6">
+          {/* BENTO GRID */}
+          <section className="pb-16">
+            <motion.div
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.4 }}
+              className="flex items-center gap-4 mb-6"
+            >
               <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Projekte</span>
               <div className="h-px flex-1 bg-border/40" />
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
               {/* NeoGarden */}
-              <a href="https://garten.neo457.ch" target="_blank" rel="noopener noreferrer"
+              <motion.a
+                href="https://garten.neo457.ch" target="_blank" rel="noopener noreferrer"
                 className="card-glow group lg:col-span-2 rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur hover:bg-card/70"
-                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}>
+                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
+                variants={fadeUp} initial="hidden" whileInView="show" custom={0}
+                viewport={{ once: true }}
+                whileHover={{ y: -3 }} transition={{ duration: 0.2 }}
+              >
                 <div className="flex h-full flex-col gap-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -199,12 +245,17 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-              </a>
+              </motion.a>
 
               {/* NeoDish */}
-              <a href="https://essen.neo457.ch" target="_blank" rel="noopener noreferrer"
+              <motion.a
+                href="https://essen.neo457.ch" target="_blank" rel="noopener noreferrer"
                 className="card-glow group rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur hover:bg-card/70"
-                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}>
+                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
+                variants={fadeUp} initial="hidden" whileInView="show" custom={1}
+                viewport={{ once: true }}
+                whileHover={{ y: -3 }} transition={{ duration: 0.2 }}
+              >
                 <div className="flex h-full flex-col gap-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -229,11 +280,16 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-              </a>
+              </motion.a>
 
-              {/* NeoFlow — full width */}
-              <div className="card-glow group lg:col-span-3 rounded-2xl border border-aria/20 bg-card/40 p-6 backdrop-blur"
-                style={{ boxShadow: "inset 0 1px 0 rgba(74,222,128,0.05), 0 0 40px rgba(74,222,128,0.04)" }}>
+              {/* NeoFlow */}
+              <motion.div
+                className="card-glow group lg:col-span-3 rounded-2xl border border-aria/20 bg-card/40 p-6 backdrop-blur"
+                style={{ boxShadow: "inset 0 1px 0 rgba(74,222,128,0.05),0 0 40px rgba(74,222,128,0.04)" }}
+                variants={fadeUp} initial="hidden" whileInView="show" custom={2}
+                viewport={{ once: true }}
+                whileHover={{ y: -2 }} transition={{ duration: 0.2 }}
+              >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex flex-col gap-4 flex-1">
                     <div className="flex items-center gap-3">
@@ -260,86 +316,86 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
             </div>
           </section>
 
-          {/* ── TERMINAL / SETUP ── */}
+          {/* SETUP / TERMINAL */}
           <section className="pb-16">
-            <div className="flex items-center gap-4 mb-6">
+            <motion.div
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.4 }}
+              className="flex items-center gap-4 mb-6"
+            >
               <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Wie ich arbeite</span>
               <div className="h-px flex-1 bg-border/40" />
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <TerminalBlock />
 
-              {/* Terminal */}
-              <div className="rounded-2xl border border-border/50 bg-[#0d0d0d] overflow-hidden">
-                {/* Title bar */}
-                <div className="flex items-center gap-2 border-b border-border/30 px-4 py-3">
-                  <span className="size-3 rounded-full bg-red-500/70" />
-                  <span className="size-3 rounded-full bg-yellow-500/70" />
-                  <span className="size-3 rounded-full bg-green-500/70" />
-                  <span className="ml-3 font-mono text-[11px] text-muted-foreground">neo@vps:~</span>
-                </div>
-                {/* Lines */}
-                <div className="p-5 font-mono text-[12px] leading-7 space-y-1">
-                  {mounted && terminalLines.map((line, i) => (
-                    <TerminalLine key={i} {...line} />
-                  ))}
-                  <div className="flex gap-2 mt-1">
-                    <span className="text-aria select-none">vps $</span>
-                    <span className="cursor-blink text-foreground/60">▋</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Setup Cards */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { icon: Laptop, label: "Laptop", detail: "VS Code + Claude Code", color: "text-aria" },
-                  { icon: Server, label: "VPS (Hetzner)", detail: "Docker · nginx · 24/7", color: "text-cyan-400" },
-                  { icon: MessageSquare, label: "Telegram", detail: "ARIA Bot · unterwegs", color: "text-violet-400" },
-                  { icon: Globe, label: "Remote", detail: "vscode.neo457.ch", color: "text-emerald-400" },
+                  { icon: Laptop, label: "Laptop", detail: "VS Code + Claude Code", color: "text-aria", delay: 0 },
+                  { icon: Server, label: "VPS (Hetzner)", detail: "Docker · nginx · 24/7", color: "text-cyan-400", delay: 0.1 },
+                  { icon: MessageSquare, label: "Telegram", detail: "ARIA Bot · unterwegs", color: "text-violet-400", delay: 0.2 },
+                  { icon: Globe, label: "Remote", detail: "vscode.neo457.ch", color: "text-emerald-400", delay: 0.3 },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
-                    <div key={item.label}
-                      className="rounded-xl border border-border/50 bg-card/30 p-4 flex flex-col gap-3 hover:border-border/80 transition-colors">
-                      <div className={`flex size-9 items-center justify-center rounded-lg border border-border/60 bg-muted/40`}>
+                    <motion.div
+                      key={item.label}
+                      variants={fadeUp} initial="hidden" whileInView="show" custom={item.delay * 10}
+                      viewport={{ once: true }}
+                      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+                      className="rounded-xl border border-border/50 bg-card/30 p-4 flex flex-col gap-3 hover:border-border/80 transition-colors cursor-default"
+                    >
+                      <div className="flex size-9 items-center justify-center rounded-lg border border-border/60 bg-muted/40">
                         <Icon className={`size-4 ${item.color}`} />
                       </div>
                       <div>
                         <p className="text-sm font-semibold">{item.label}</p>
                         <p className="font-mono text-[10px] text-muted-foreground mt-0.5">{item.detail}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
             </div>
           </section>
 
-          {/* ── STACK ── */}
+          {/* STACK */}
           <section className="pb-24">
-            <div className="flex items-center gap-4 mb-6">
+            <motion.div
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.4 }}
+              className="flex items-center gap-4 mb-6"
+            >
               <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Stack</span>
               <div className="h-px flex-1 bg-border/40" />
-            </div>
-            <div className="flex flex-wrap gap-2">
+            </motion.div>
+            <motion.div
+              className="flex flex-wrap gap-2"
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+            >
               {stack.map((tech) => (
-                <span key={tech}
-                  className="rounded-lg border border-border/50 bg-muted/20 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:border-aria/30 hover:text-foreground transition-colors cursor-default">
+                <motion.span
+                  key={tech}
+                  variants={{ hidden: { opacity: 0, scale: 0.85 }, show: { opacity: 1, scale: 1 } }}
+                  whileHover={{ y: -2, transition: { duration: 0.15 } }}
+                  className="rounded-lg border border-border/50 bg-muted/20 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:border-aria/30 hover:text-foreground transition-colors cursor-default"
+                >
                   {tech}
-                </span>
+                </motion.span>
               ))}
-            </div>
+            </motion.div>
           </section>
 
         </main>
 
-        {/* ── FOOTER ── */}
+        {/* FOOTER */}
         <footer className="border-t border-border/30">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5 text-xs text-muted-foreground sm:px-8">
             <div className="flex items-center gap-2">
