@@ -10,37 +10,8 @@ import {
   Github, Server, Laptop, MessageSquare, Globe, Lock,
 } from "lucide-react";
 
-// ─── METEORS ────────────────────────────────────────────────────────────────
-function Meteors({ number = 18 }: { number?: number }) {
-  const [styles, setStyles] = useState<React.CSSProperties[]>([]);
-  useEffect(() => {
-    setStyles(
-      Array.from({ length: number }, () => ({
-        top: "-5px",
-        left: Math.floor(Math.random() * (typeof window !== "undefined" ? window.innerWidth : 1200)) + "px",
-        animationDelay: (Math.random() * 4).toFixed(2) + "s",
-        animationDuration: (Math.random() * 6 + 4).toFixed(2) + "s",
-      }))
-    );
-  }, [number]);
-
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {styles.map((s, i) => (
-        <span
-          key={i}
-          className="animate-meteor absolute h-px w-px rotate-[215deg] rounded-full bg-white/70 shadow-[0_0_0_1px_#ffffff15]"
-          style={s}
-        >
-          <div className="absolute top-1/2 -z-10 h-px w-[80px] -translate-y-1/2 bg-gradient-to-r from-white/60 to-transparent" />
-        </span>
-      ))}
-    </div>
-  );
-}
-
 // ─── SPARKLES ───────────────────────────────────────────────────────────────
-const SPARKLE_COLORS = ["#4ade80", "#22d3ee", "#a78bfa", "#f9fafb"];
+const SPARKLE_COLORS = ["#4ade80", "#86efac", "#bbf7d0", "#dcfce7"];
 
 function Sparkle({ x, y, color, size, delay }: { x: string | number; y: string | number; color: string; size: number; delay: number }) {
   return (
@@ -197,7 +168,7 @@ export default function Home() {
           0%,100%{background-position:0% 50%}50%{background-position:100% 50%}
         }
         .gradient-text{
-          background:linear-gradient(135deg,#4ade80,#22d3ee,#a78bfa,#4ade80);
+          background:linear-gradient(135deg,#86efac,#4ade80,#16a34a,#4ade80,#86efac);
           background-size:300% 300%;
           -webkit-background-clip:text;
           -webkit-text-fill-color:transparent;
@@ -239,9 +210,8 @@ export default function Home() {
 
         <main className="mx-auto max-w-7xl px-5 sm:px-8">
 
-          {/* HERO — with Meteors + Sparkles */}
+          {/* HERO — with Sparkles */}
           <section className="relative pt-20 pb-16 sm:pt-28 sm:pb-20 overflow-hidden">
-            <Meteors number={18} />
             <Sparkles count={10} />
 
             <div className="relative z-10 max-w-4xl space-y-6">
@@ -293,7 +263,7 @@ export default function Home() {
               viewport={{ once: true }} transition={{ duration: 0.4 }}
               className="flex items-center gap-4 mb-6"
             >
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Projekte</span>
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-foreground/60">Projekte</span>
               <div className="h-px flex-1 bg-border/40" />
             </motion.div>
 
@@ -344,21 +314,21 @@ export default function Home() {
                 viewport={{ once: true }}
                 whileHover={{ y: -3 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-aria/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative flex h-full flex-col gap-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-cyan-400/40 transition-colors">
-                        <UtensilsCrossed className="size-5 text-cyan-400" />
+                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-aria/40 transition-colors">
+                        <UtensilsCrossed className="size-5 text-aria" />
                       </div>
                       <div>
                         <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">02</p>
                         <h2 className="text-base font-bold">NeoDish</h2>
                       </div>
                     </div>
-                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-cyan-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-aria group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
-                  <p className="font-mono text-[11px] text-cyan-400">Keine Frage mehr: Was essen wir heute?</p>
+                  <p className="font-mono text-[11px] text-aria">Keine Frage mehr: Was essen wir heute?</p>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
                     Wochenplaner für Mahlzeiten. Rezepte organisieren,
                     Wochen vorplanen, Einkaufsliste auf Knopfdruck.
@@ -373,8 +343,8 @@ export default function Home() {
 
               {/* NeoFlow — with BorderBeam */}
               <motion.div
-                className="relative group lg:col-span-3 rounded-2xl border border-aria/25 bg-card/40 p-6 backdrop-blur overflow-hidden"
-                style={{ boxShadow: "inset 0 1px 0 rgba(74,222,128,0.05), 0 0 60px rgba(74,222,128,0.06)" }}
+                className="relative group lg:col-span-3 rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
+                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 variants={fadeUp} initial="hidden" whileInView="show" custom={2}
                 viewport={{ once: true }}
                 whileHover={{ y: -2 }}
@@ -420,7 +390,7 @@ export default function Home() {
               viewport={{ once: true }} transition={{ duration: 0.4 }}
               className="flex items-center gap-4 mb-6"
             >
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Wie ich arbeite</span>
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-foreground/60">Wie ich arbeite</span>
               <div className="h-px flex-1 bg-border/40" />
             </motion.div>
 
@@ -463,7 +433,7 @@ export default function Home() {
               viewport={{ once: true }} transition={{ duration: 0.4 }}
               className="flex items-center gap-4 mb-6"
             >
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Stack</span>
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-foreground/60">Stack</span>
               <div className="h-px flex-1 bg-border/40" />
             </motion.div>
             <motion.div
