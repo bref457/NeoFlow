@@ -45,6 +45,8 @@ export async function createCalendarEntry(formData: FormData) {
     }
   }
 
+  const app_name = String(formData.get("app_name") ?? "").trim() || null;
+
   const { error } = await supabase.from("calendar_entries").insert({
     user_id: user.id,
     title,
@@ -52,6 +54,7 @@ export async function createCalendarEntry(formData: FormData) {
     starts_at: startsAt.toISOString(),
     recurrence_rule: recurrenceRule,
     recurrence_until: recurrenceUntilIso,
+    app_name,
   });
 
   if (error) {
@@ -112,6 +115,8 @@ export async function updateCalendarEntry(formData: FormData) {
     }
   }
 
+  const app_name = String(formData.get("app_name") ?? "").trim() || null;
+
   const { error } = await supabase
     .from("calendar_entries")
     .update({
@@ -120,6 +125,7 @@ export async function updateCalendarEntry(formData: FormData) {
       starts_at: startsAt.toISOString(),
       recurrence_rule: recurrenceRule,
       recurrence_until: recurrenceUntilIso,
+      app_name,
     })
     .eq("id", entryId)
     .eq("user_id", user.id)

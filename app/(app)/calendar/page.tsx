@@ -22,6 +22,7 @@ type CalendarEntryRow = {
   starts_at: string;
   recurrence_rule: CalendarRecurrenceRule;
   recurrence_until: string | null;
+  app_name: string | null;
 };
 
 type DueTaskRow = {
@@ -132,7 +133,7 @@ export default async function CalendarPage({
   const [entriesResult, dueTasksResult, projectsWithColorResult] = await Promise.all([
     supabase
       .from("calendar_entries")
-      .select("id, title, note, starts_at, recurrence_rule, recurrence_until")
+      .select("id, title, note, starts_at, recurrence_rule, recurrence_until, app_name")
       .eq("user_id", user.id)
       .is("archived_at", null)
       .lt("starts_at", monthEnd.toISOString())
@@ -315,6 +316,16 @@ export default async function CalendarPage({
               <Input name="title" placeholder="Titel" required minLength={1} maxLength={160} />
               <Input name="startsAt" type="datetime-local" defaultValue={initialDateTime} required />
               <select
+                name="app_name"
+                defaultValue=""
+                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              >
+                <option value="">Kein Projekt</option>
+                {typedProjects.map((p) => (
+                  <option key={p.id} value={p.name}>{p.name}</option>
+                ))}
+              </select>
+              <select
                 name="recurrenceRule"
                 defaultValue="none"
                 className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
@@ -357,7 +368,14 @@ export default async function CalendarPage({
               <div key={`${entry.id}:${occurrenceAt}`} className="rounded-lg border p-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div className="space-y-1">
-                    <p className="font-medium">{entry.title}</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-medium">{entry.title}</p>
+                      {entry.app_name && (
+                        <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                          {entry.app_name}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground">Termin {formatDateTimeEU(occurrenceAt)}</p>
                     {entry.recurrence_rule !== "none" ? (
                       <p className="text-xs text-muted-foreground">
@@ -384,6 +402,16 @@ export default async function CalendarPage({
                       defaultValue={formatDateTimeInputValueFromIso(entry.starts_at)}
                       required
                     />
+                    <select
+                      name="app_name"
+                      defaultValue={entry.app_name ?? ""}
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                    >
+                      <option value="">Kein Projekt</option>
+                      {typedProjects.map((p) => (
+                        <option key={p.id} value={p.name}>{p.name}</option>
+                      ))}
+                    </select>
                     <select
                       name="recurrenceRule"
                       defaultValue={entry.recurrence_rule}
