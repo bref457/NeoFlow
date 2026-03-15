@@ -365,8 +365,8 @@ export default function Home() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-aria/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex flex-col gap-4 flex-1">
+                <div className="relative flex h-full flex-col gap-4">
+                  <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex size-11 items-center justify-center rounded-xl border border-aria/30 bg-aria-dim">
                         <MonitorDot className="size-5 text-aria" />
@@ -375,27 +375,27 @@ export default function Home() {
                         <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">03</p>
                         <h2 className="text-base font-bold">NeoFlow</h2>
                       </div>
-                      <span className="ml-1 flex items-center gap-1 rounded-full border border-aria/20 bg-aria-dim px-2 py-0.5 font-mono text-[10px] text-aria">
-                        <Lock className="size-2.5" /> Private
-                      </span>
                     </div>
-                    <p className="font-mono text-[11px] text-aria">Mein persönliches Kontrollzentrum.</p>
-                    <p className="text-sm leading-relaxed text-muted-foreground max-w-xl">
-                      Überblick über alle Services, Docker Container, VPS-Ressourcen,
-                      Tasks und Notizen — alles auf einen Blick, von überall erreichbar.
-                    </p>
+                    <span className="flex items-center gap-1 rounded-full border border-aria/20 bg-aria-dim px-2 py-0.5 font-mono text-[10px] text-aria">
+                      <Lock className="size-2.5" /> Private
+                    </span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 sm:flex-col sm:items-end sm:gap-2">
+                  <p className="font-mono text-[11px] text-aria">Mein persönliches Kontrollzentrum.</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground flex-1">
+                    Überblick über alle Services, Docker Container, VPS-Ressourcen,
+                    Tasks und Notizen — alles auf einen Blick, von überall erreichbar.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
                     {["Mission Control", "Docker", "Self-hosted"].map(t => (
                       <span key={t} className="rounded-md border border-aria/20 bg-aria-dim/50 px-2 py-0.5 font-mono text-[10px] text-aria">{t}</span>
                     ))}
-                    <button
-                      onClick={() => setOpenDialog("neoflow")}
-                      className="font-mono text-[11px] text-aria/60 transition-colors hover:text-aria sm:text-right"
-                    >
-                      Mehr erfahren →
-                    </button>
                   </div>
+                  <button
+                    onClick={() => setOpenDialog("neoflow")}
+                    className="self-start font-mono text-[11px] text-aria/60 transition-colors hover:text-aria"
+                  >
+                    Mehr erfahren →
+                  </button>
                 </div>
               </motion.div>
 
