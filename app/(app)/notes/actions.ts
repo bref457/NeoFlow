@@ -105,6 +105,31 @@ export async function updateNote(formData: FormData) {
   revalidatePath("/notes");
 }
 
+export async function markNoteDone(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const noteId = String(formData.get("noteId") ?? "");
+  const done = formData.get("done") === "true";
+
+  if (!noteId) return;
+
+  const { error } = await supabase
+    .from("notes")
+    .update({ done })
+    .eq("id", noteId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/notes");
+  revalidatePath("/projects/[id]");
+}
+
 export async function restoreNote(formData: FormData) {
   const supabase = await createClient();
   const {

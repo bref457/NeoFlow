@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeEU } from "@/lib/date-format";
-import { createNote, deleteNote, updateNote } from "./actions";
+import { createNote, deleteNote, updateNote, markNoteDone } from "./actions";
 import { DeleteNoteForm } from "./delete-note-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -15,6 +15,7 @@ type NoteRow = {
   category: string | null;
   app_name: string | null;
   source: string | null;
+  done: boolean;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -36,12 +37,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default async function NotesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; app?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; app?: string; done?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
   const query = String(resolvedSearchParams.q ?? "").trim();
   const filterCategory = String(resolvedSearchParams.category ?? "").trim();
   const filterApp = String(resolvedSearchParams.app ?? "").trim();
+  const showDone = resolvedSearchParams.done === "1";
 
   const supabase = await createClient();
 
@@ -53,8 +55,9 @@ export default async function NotesPage({
 
   let notesQuery = supabase
     .from("notes")
-    .select("id, content, created_at, category, app_name, source")
+    .select("id, content, created_at, category, app_name, source, done")
     .is("archived_at", null)
+    .eq("done", showDone)
     .order("created_at", { ascending: false });
 
   if (query) {
@@ -73,7 +76,7 @@ export default async function NotesPage({
   }
 
   const noteCount = (notes as NoteRow[] | null)?.length ?? 0;
-  const hasFilter = !!(query || filterCategory || filterApp);
+  const hasFilter = !!(query || filterCategory || filterApp || showDone);
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -155,6 +158,14 @@ export default async function NotesPage({
                 <option key={p.id} value={p.name}>{p.name}</option>
               ))}
             </select>
+            <select
+              name="done"
+              defaultValue={showDone ? "1" : "0"}
+              className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="0">Offen</option>
+              <option value="1">Erledigt</option>
+            </select>
             <Button type="submit" variant="outline" className="w-full sm:w-auto">
               Filtern
             </Button>
@@ -227,7 +238,14 @@ export default async function NotesPage({
                       </form>
                     </details>
                   </div>
-                  <div className="self-end sm:self-auto">
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <form action={markNoteDone}>
+                      <input type="hidden" name="noteId" value={note.id} />
+                      <input type="hidden" name="done" value={note.done ? "false" : "true"} />
+                      <Button type="submit" variant="outline" size="sm">
+                        {note.done ? "Wieder öffnen" : "Erledigt"}
+                      </Button>
+                    </form>
                     <DeleteNoteForm noteId={note.id} action={deleteNote} />
                   </div>
                 </CardContent>
