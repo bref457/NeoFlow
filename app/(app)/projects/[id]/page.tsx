@@ -188,6 +188,25 @@ export default async function ProjectDetailPage({
   const doneCount = tasks.filter((task) => task.done).length;
   const openCount = tasks.length - doneCount;
 
+  // NeoGarden User-Count
+  let neogardenUserCount: number | null = null;
+  if (typedProject.name === "NeoGarden" && process.env.NEOGARDEN_SERVICE_KEY) {
+    try {
+      const res = await fetch(`${process.env.NEOGARDEN_SUPABASE_URL}/auth/v1/admin/users`, {
+        headers: {
+          apikey: process.env.NEOGARDEN_SERVICE_KEY,
+          Authorization: `Bearer ${process.env.NEOGARDEN_SERVICE_KEY}`,
+        },
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const emails = (data.users ?? []).map((u: any) => u.email).filter(Boolean);
+        neogardenUserCount = new Set(emails).size;
+      }
+    } catch {}
+  }
+
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="space-y-3">
@@ -207,6 +226,11 @@ export default async function ProjectDetailPage({
           <p className="text-xs text-muted-foreground">
             Gesamt: {tasks.length} | Offen: {openCount} | Erledigt: {doneCount}
           </p>
+          {neogardenUserCount !== null && (
+            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              Registrierte User: {neogardenUserCount}
+            </p>
+          )}
         </div>
       </div>
 
