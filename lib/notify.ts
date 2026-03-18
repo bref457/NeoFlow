@@ -1,11 +1,8 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL ?? "fabio@neo457.ch";
-
 export async function sendTelegram(text: string): Promise<void> {
+  const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
   if (!TELEGRAM_TOKEN || !TELEGRAM_CHAT_ID) return;
   try {
     await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
@@ -29,6 +26,8 @@ type EmailOptions = {
 };
 
 export async function sendNotifyEmail({ subject, html, replyTo }: EmailOptions): Promise<void> {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL ?? "fabio@neo457.ch";
   try {
     await resend.emails.send({
       from: "NeoFlow <info@neo457.ch>",
