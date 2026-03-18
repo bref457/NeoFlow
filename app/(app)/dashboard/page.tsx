@@ -15,11 +15,12 @@ type ProjectRow = {
   created_at: string;
 };
 
-type TaskNoteRow = {
+type NoteRow = {
   id: string;
   app_name: string | null;
   done: boolean;
-  created_at: string;
+  category: string | null;
+  priority: string | null;
 };
 
 export default async function DashboardPage() {
@@ -32,7 +33,7 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const [projectsWithColorResult, tasksResult, notesResult] = await Promise.all([
+  const [projectsWithColorResult, notesResult, highPrioResult] = await Promise.all([
     supabase
       .from("projects")
       .select("id, name, color, created_at")
@@ -41,15 +42,16 @@ export default async function DashboardPage() {
       .order("created_at", { ascending: false }),
     supabase
       .from("notes")
-      .select("id, app_name, done, created_at")
+      .select("id, app_name, done, category, priority")
       .eq("user_id", user.id)
-      .eq("category", "task")
       .is("archived_at", null),
     supabase
       .from("notes")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
-      .neq("category", "task")
+      .eq("category", "task")
+      .eq("priority", "hoch")
+      .eq("done", false)
       .is("archived_at", null),
   ]);
 
@@ -72,25 +74,25 @@ export default async function DashboardPage() {
   }
 
   if (projectsError) throw new Error(projectsError.message);
-  if (tasksResult.error) throw new Error(tasksResult.error.message);
   if (notesResult.error) throw new Error(notesResult.error.message);
+  if (highPrioResult.error) throw new Error(highPrioResult.error.message);
 
   const projects = (projectsData ?? []) as ProjectRow[];
-  const tasks = (tasksResult.data ?? []) as TaskNoteRow[];
-  const notesCount = notesResult.count ?? 0;
+  const notes = (notesResult.data ?? []) as NoteRow[];
+  const highPrioCount = highPrioResult.count ?? 0;
 
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter((t) => t.done).length;
-  const openTasks = totalTasks - completedTasks;
-  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const totalNotes = notes.length;
+  const openNotes = notes.filter((n) => !n.done).length;
+  const completedNotes = notes.filter((n) => n.done).length;
+  const completionRate = totalNotes > 0 ? Math.round((completedNotes / totalNotes) * 100) : 0;
 
-  // Projekt-Stats via app_name matching
+  // Projekt-Stats: tasks pro Projekt
   const statsByProjectName = new Map<string, { total: number; done: number }>();
-  for (const task of tasks) {
-    const name = task.app_name ?? "";
+  for (const note of notes.filter((n) => n.category === "task")) {
+    const name = note.app_name ?? "";
     const current = statsByProjectName.get(name) ?? { total: 0, done: 0 };
     current.total += 1;
-    if (task.done) current.done += 1;
+    if (note.done) current.done += 1;
     statsByProjectName.set(name, current);
   }
 
@@ -114,23 +116,21 @@ export default async function DashboardPage() {
 
         <Card className="border-border/70 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription>Offene Tasks</CardDescription>
-            <CardTitle className="text-3xl"><NumberTicker value={openTasks} /></CardTitle>
+            <CardDescription>Notizen</CardDescription>
+            <CardTitle className="text-3xl"><NumberTicker value={totalNotes} /></CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">
-              {completedTasks} von {totalTasks} erledigt ({completionRate}%)
-            </p>
+            <p className="text-xs text-muted-foreground">{openNotes} offen · {completedNotes} erledigt</p>
           </CardContent>
         </Card>
 
         <Card className="border-border/70 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription>Notizen</CardDescription>
-            <CardTitle className="text-3xl"><NumberTicker value={notesCount} /></CardTitle>
+            <CardDescription>Hohe Priorität</CardDescription>
+            <CardTitle className="text-3xl"><NumberTicker value={highPrioCount} /></CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">Ideen, Feedback & Infra-Notizen.</p>
+            <p className="text-xs text-muted-foreground">Offene Tasks mit Priorität Hoch.</p>
           </CardContent>
         </Card>
       </div>
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
         <CardHeader>
           <CardTitle>Fortschritt gesamt</CardTitle>
           <CardDescription>
-            {completedTasks} von {totalTasks} Tasks erledigt.
+            {completedNotes} von {totalNotes} Einträgen erledigt.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -176,7 +176,7 @@ export default async function DashboardPage() {
                         <p className="truncate text-sm font-medium">{project.name}</p>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {stats.done}/{stats.total} erledigt ({projectRate}%)
+                        {stats.done}/{stats.total} Tasks erledigt ({projectRate}%)
                       </p>
                     </div>
                     <Button asChild variant="outline" size="sm">
