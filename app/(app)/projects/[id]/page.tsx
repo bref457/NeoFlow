@@ -1,26 +1,18 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeEU } from "@/lib/date-format";
-import { createTask, deleteTask, updateTask } from "./actions";
-import { createNote, deleteNote, markNoteDone } from "@/app/(app)/notes/actions";
+import { updateNote, deleteNote, markNoteDone, createNote } from "@/app/(app)/notes/actions";
 import { DeleteNoteForm } from "@/app/(app)/notes/delete-note-form";
 import { NoteForm } from "@/components/notes/note-form";
 import { DeleteProjectButton } from "../delete-project-button";
-import { TaskToggleForm } from "./task-toggle-form";
-import { DeleteTaskForm } from "./delete-task-form";
+import { NoteToggleForm } from "./note-toggle-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_PROJECT_COLOR, normalizeProjectColor } from "@/lib/project-colors";
 import { BorderBeam } from "@/components/ui/border-beam";
-import {
-  compareTaskPriority,
-  DEFAULT_TASK_PRIORITY,
-  normalizeTaskPriority,
-  type TaskPriority,
-} from "@/lib/task-priority";
 
 type NoteRow = {
   id: string;
@@ -31,6 +23,12 @@ type NoteRow = {
   done: boolean;
   priority: string | null;
   due_date: string | null;
+};
+
+type ProjectRow = {
+  id: string;
+  name: string;
+  color: string;
 };
 
 const NOTE_CATEGORY_LABELS: Record<string, string> = {
@@ -49,19 +47,12 @@ const NOTE_CATEGORY_COLORS: Record<string, string> = {
   claude: "bg-green-500/15 text-green-400",
 };
 
-type ProjectRow = {
-  id: string;
-  name: string;
-  color: string;
-};
+const PRIORITY_ORDER: Record<string, number> = { hoch: 0, mittel: 1, niedrig: 2 };
 
-type TaskRow = {
-  id: string;
-  title: string;
-  done: boolean;
-  priority: TaskPriority;
-  due_at: string | null;
-  created_at: string;
+const priorityBadgeClass: Record<string, string> = {
+  hoch: "bg-red-100 text-red-700",
+  mittel: "bg-amber-100 text-amber-700",
+  niedrig: "bg-emerald-100 text-emerald-700",
 };
 
 function formatDateTimeInputValue(value: string | null) {
@@ -76,18 +67,6 @@ function formatDateTimeInputValue(value: string | null) {
   return `${year}-${month}-${day}T${hour}:${minute}`;
 }
 
-const priorityLabel: Record<TaskPriority, string> = {
-  high: "Hoch",
-  medium: "Mittel",
-  low: "Niedrig",
-};
-
-const priorityBadgeClass: Record<TaskPriority, string> = {
-  high: "bg-red-100 text-red-700",
-  medium: "bg-amber-100 text-amber-700",
-  low: "bg-emerald-100 text-emerald-700",
-};
-
 export default async function ProjectDetailPage({
   params,
   searchParams,
@@ -101,8 +80,8 @@ export default async function ProjectDetailPage({
   const statusRaw = String(resolvedSearchParams.status ?? "").trim();
   const statusFilter = statusRaw === "open" || statusRaw === "done" ? statusRaw : "all";
   const priorityRaw = String(resolvedSearchParams.priority ?? "").trim();
-  const priorityFilter: TaskPriority | "all" =
-    priorityRaw === "low" || priorityRaw === "medium" || priorityRaw === "high" ? priorityRaw : "all";
+  const priorityFilter =
+    priorityRaw === "hoch" || priorityRaw === "mittel" || priorityRaw === "niedrig" ? priorityRaw : "all";
 
   const supabase = await createClient();
   const {
@@ -142,15 +121,20 @@ export default async function ProjectDetailPage({
     throw new Error(projectError.message);
   }
 
+  const typedProject = project as ProjectRow;
+  const projectColor = normalizeProjectColor(typedProject.color);
+
+  // Tasks: notes mit category=task für dieses Projekt
   let tasksQuery = supabase
-    .from("tasks")
-    .select("id, title, done, priority, due_at, created_at")
-    .eq("project_id", id)
+    .from("notes")
+    .select("id, content, done, priority, due_date, created_at")
     .eq("user_id", user.id)
+    .eq("app_name", typedProject.name)
+    .eq("category", "task")
     .is("archived_at", null)
     .order("created_at", { ascending: false });
 
-  if (taskQuery) tasksQuery = tasksQuery.ilike("title", `%${taskQuery}%`);
+  if (taskQuery) tasksQuery = tasksQuery.ilike("content", `%${taskQuery}%`);
   if (statusFilter === "open") tasksQuery = tasksQuery.eq("done", false);
   if (statusFilter === "done") tasksQuery = tasksQuery.eq("done", true);
   if (priorityFilter !== "all") tasksQuery = tasksQuery.eq("priority", priorityFilter);
@@ -158,34 +142,33 @@ export default async function ProjectDetailPage({
   const { data: tasksData, error: tasksError } = await tasksQuery;
   if (tasksError) throw new Error(tasksError.message);
 
+  // Notizen: alle anderen notes für dieses Projekt (ohne tasks)
   const { data: notesData, error: notesError } = await supabase
     .from("notes")
     .select("id, content, created_at, category, source, done, priority, due_date")
-    .eq("app_name", project!.name)
+    .eq("app_name", typedProject.name)
+    .neq("category", "task")
     .is("archived_at", null)
     .order("created_at", { ascending: false });
   if (notesError) throw new Error(notesError.message);
+
+  const tasks = (tasksData ?? []) as NoteRow[];
   const notes = (notesData ?? []) as NoteRow[];
 
-  const tasks = ((tasksData ?? []) as TaskRow[]).map((task) => ({
-    ...task,
-    priority: normalizeTaskPriority(task.priority),
-  }));
-
+  // Tasks sortieren: priority → due_date → created_at
   tasks.sort((a, b) => {
-    const priorityComparison = compareTaskPriority(a.priority, b.priority);
-    if (priorityComparison !== 0) return priorityComparison;
-    if (a.due_at && b.due_at) {
-      const dueComparison = new Date(a.due_at).getTime() - new Date(b.due_at).getTime();
-      if (dueComparison !== 0) return dueComparison;
-    } else if (a.due_at && !b.due_at) return -1;
-    else if (!a.due_at && b.due_at) return 1;
+    const pa = PRIORITY_ORDER[a.priority ?? ""] ?? 1;
+    const pb = PRIORITY_ORDER[b.priority ?? ""] ?? 1;
+    if (pa !== pb) return pa - pb;
+    if (a.due_date && b.due_date) {
+      const diff = new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+      if (diff !== 0) return diff;
+    } else if (a.due_date && !b.due_date) return -1;
+    else if (!a.due_date && b.due_date) return 1;
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
-  const typedProject = project as ProjectRow;
-  const projectColor = normalizeProjectColor(typedProject.color);
-  const doneCount = tasks.filter((task) => task.done).length;
+  const doneCount = tasks.filter((t) => t.done).length;
   const openCount = tasks.length - doneCount;
 
   // NeoGarden User-Count
@@ -252,7 +235,7 @@ export default async function ProjectDetailPage({
         <CardHeader>
           <CardTitle>Suche & Filter</CardTitle>
           <CardDescription>
-            Filtere Tasks nach Titel, Status und Priorität.{" "}
+            Filtere Tasks nach Inhalt, Status und Priorität.{" "}
             {taskQuery || statusFilter !== "all" || priorityFilter !== "all" ? `Treffer: ${tasks.length}` : ""}
           </CardDescription>
         </CardHeader>
@@ -260,7 +243,7 @@ export default async function ProjectDetailPage({
           <form className="grid gap-3 sm:grid-cols-[1fr_auto_auto_auto_auto] sm:items-center">
             <Input
               name="q"
-              placeholder="z. B. Apfel, Rechnung, Follow-up"
+              placeholder="z. B. Login, Deploy, Idee..."
               defaultValue={taskQuery}
               className="sm:min-w-64"
             />
@@ -279,9 +262,9 @@ export default async function ProjectDetailPage({
               className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
             >
               <option value="all">Alle Prioritäten</option>
-              <option value="high">Hoch</option>
-              <option value="medium">Mittel</option>
-              <option value="low">Niedrig</option>
+              <option value="hoch">Hoch</option>
+              <option value="mittel">Mittel</option>
+              <option value="niedrig">Niedrig</option>
             </select>
             <Button type="submit" variant="outline" className="w-full sm:w-auto">
               Filtern
@@ -301,43 +284,49 @@ export default async function ProjectDetailPage({
             <Card key={task.id} className="border-border/70 shadow-sm">
               <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 items-start gap-3">
-                  <TaskToggleForm taskId={task.id} done={task.done} />
+                  <NoteToggleForm noteId={task.id} done={task.done} />
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <p className={task.done ? "line-through text-muted-foreground" : ""}>{task.title}</p>
-                      <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${priorityBadgeClass[task.priority]}`}
-                      >
-                        {priorityLabel[task.priority]}
-                      </span>
+                      <p className={task.done ? "line-through text-muted-foreground" : ""}>{task.content}</p>
+                      {task.priority && (
+                        <span
+                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${priorityBadgeClass[task.priority] ?? "bg-muted text-muted-foreground"}`}
+                        >
+                          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-muted-foreground">Erstellt am {formatDateTimeEU(task.created_at)}</p>
-                    {task.due_at ? <p className="text-xs text-muted-foreground">Termin: {formatDateTimeEU(task.due_at)}</p> : null}
+                    {task.due_date ? (
+                      <p className="text-xs text-muted-foreground">Termin: {formatDateTimeEU(task.due_date)}</p>
+                    ) : null}
                     <details>
                       <summary className="cursor-pointer text-xs text-muted-foreground">Bearbeiten</summary>
-                      <form action={updateTask} className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                        <input type="hidden" name="taskId" value={task.id} />
+                      <form action={updateNote} className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                        <input type="hidden" name="noteId" value={task.id} />
+                        <input type="hidden" name="category" value="task" />
+                        <input type="hidden" name="app_name" value={typedProject.name} />
                         <Input
-                          name="title"
-                          defaultValue={task.title}
+                          name="content"
+                          defaultValue={task.content}
                           required
                           minLength={1}
-                          maxLength={240}
+                          maxLength={2000}
                           className="sm:min-w-64 sm:flex-1"
                         />
                         <select
                           name="priority"
-                          defaultValue={task.priority}
+                          defaultValue={task.priority ?? "mittel"}
                           className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                         >
-                          <option value="high">Hoch</option>
-                          <option value="medium">Mittel</option>
-                          <option value="low">Niedrig</option>
+                          <option value="hoch">Hoch</option>
+                          <option value="mittel">Mittel</option>
+                          <option value="niedrig">Niedrig</option>
                         </select>
                         <Input
-                          name="dueAt"
+                          name="due_date"
                           type="datetime-local"
-                          defaultValue={formatDateTimeInputValue(task.due_at)}
+                          defaultValue={formatDateTimeInputValue(task.due_date)}
                           className="sm:w-auto"
                         />
                         <Button type="submit" size="sm" className="sm:w-auto">
@@ -348,7 +337,7 @@ export default async function ProjectDetailPage({
                   </div>
                 </div>
                 <div className="self-end sm:self-auto">
-                  <DeleteTaskForm taskId={task.id} projectId={typedProject.id} action={deleteTask} />
+                  <DeleteNoteForm noteId={task.id} action={deleteNote} />
                 </div>
               </CardContent>
             </Card>
@@ -359,7 +348,7 @@ export default async function ProjectDetailPage({
               <p className="text-sm text-muted-foreground">
                 {taskQuery || statusFilter !== "all" || priorityFilter !== "all"
                   ? "Keine Tasks für den aktuellen Filter gefunden."
-                  : "Noch keine Tasks vorhanden. Erstelle deinen ersten Task."}
+                  : "Noch keine Tasks vorhanden. Erstelle deinen ersten Task oben."}
               </p>
             </CardContent>
           </Card>
@@ -386,12 +375,6 @@ export default async function ProjectDetailPage({
                         )}
                       </div>
                       <p className={`whitespace-pre-wrap break-words ${note.done ? "line-through text-muted-foreground" : ""}`}>{note.content}</p>
-                      {note.category === "task" && (
-                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          {note.priority && <span>Priorität: <strong>{note.priority}</strong></span>}
-                          {note.due_date && <span>Fällig: <strong>{formatDateTimeEU(note.due_date)}</strong></span>}
-                        </div>
-                      )}
                       <p className="text-xs text-muted-foreground">{formatDateTimeEU(note.created_at)}</p>
                     </div>
                     <div className="flex items-center gap-2 self-end sm:self-auto">
@@ -420,5 +403,3 @@ export default async function ProjectDetailPage({
     </div>
   );
 }
-
-
