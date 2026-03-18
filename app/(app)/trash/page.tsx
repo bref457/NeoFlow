@@ -163,7 +163,7 @@ export default async function TrashPage() {
       {!!archivedNotes.length && (
         <Card className="border-border/70 shadow-sm">
           <CardHeader>
-            <CardTitle>Notizen</CardTitle>
+            <CardTitle>Inbox</CardTitle>
             <CardDescription>{archivedNotes.length} Eintrag(e)</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">

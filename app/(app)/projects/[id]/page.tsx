@@ -356,7 +356,7 @@ export default async function ProjectDetailPage({
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold tracking-tight">Notizen</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Inbox</h2>
         <div className="grid gap-4">
           {notes.length ? (
             notes.map((note) => {
@@ -394,7 +394,7 @@ export default async function ProjectDetailPage({
           ) : (
             <Card className="border-dashed">
               <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">Keine Notizen für dieses Projekt vorhanden.</p>
+                <p className="text-sm text-muted-foreground">Keine Einträge für dieses Projekt vorhanden.</p>
               </CardContent>
             </Card>
           )}

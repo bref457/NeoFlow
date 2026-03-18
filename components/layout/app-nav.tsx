@@ -15,7 +15,7 @@ type AppNavProps = {
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/calendar", label: "Kalender", icon: CalendarDays },
-  { href: "/notes", label: "Notizen", icon: NotebookPen },
+  { href: "/notes", label: "Inbox", icon: NotebookPen },
   { href: "/projects", label: "Projekte", icon: FolderKanban },
   { href: "/trash", label: "Papierkorb", icon: Trash2 },
 ];

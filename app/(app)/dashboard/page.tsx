@@ -116,7 +116,7 @@ export default async function DashboardPage() {
 
         <Card className="border-border/70 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription>Notizen</CardDescription>
+            <CardDescription>Inbox</CardDescription>
             <CardTitle className="text-3xl"><NumberTicker value={totalNotes} /></CardTitle>
           </CardHeader>
           <CardContent>

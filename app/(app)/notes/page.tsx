@@ -85,14 +85,14 @@ export default async function NotesPage({
     <div className="flex w-full flex-col gap-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Notes</h1>
-        <p className="text-sm text-muted-foreground">Erstelle und verwalte deine Notizen.</p>
+        <p className="text-sm text-muted-foreground">Erstelle und verwalte deine Einträge.</p>
       </div>
 
       <Card className="relative overflow-hidden border-border/70 shadow-sm">
         <BorderBeam size={80} duration={8} colorFrom="#9E7AFF" colorTo="#FE8BBB" />
         <CardHeader>
-          <CardTitle>Neue Notiz</CardTitle>
-          <CardDescription>Füge schnell eine weitere Notiz hinzu.</CardDescription>
+          <CardTitle>Neuer Eintrag</CardTitle>
+          <CardDescription>Füge schnell einen weiteren Eintrag hinzu.</CardDescription>
         </CardHeader>
         <CardContent>
           <NoteForm action={createNote} projects={projects ?? []} />
@@ -238,7 +238,7 @@ export default async function NotesPage({
           <Card className="border-dashed">
             <CardContent className="pt-6">
               <p className="text-sm text-muted-foreground">
-                {hasFilter ? "Keine Notizen für diesen Filter gefunden." : "Noch keine Notes vorhanden."}
+                {hasFilter ? "Keine Einträge für diesen Filter gefunden." : "Noch keine Einträge vorhanden."}
               </p>
             </CardContent>
           </Card>

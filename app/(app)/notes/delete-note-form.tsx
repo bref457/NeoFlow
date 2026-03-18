@@ -40,7 +40,7 @@ export function DeleteNoteForm({ noteId, action }: DeleteNoteFormProps) {
         id: result.id,
         archivedAt: result.archivedAt,
         expiresAt: Date.now() + ARCHIVE_UNDO_WINDOW_MS,
-        label: "Notiz gelöscht",
+        label: "Eintrag gelöscht",
       });
 
       router.refresh();
@@ -56,13 +56,13 @@ export function DeleteNoteForm({ noteId, action }: DeleteNoteFormProps) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Notiz löschen?</AlertDialogTitle>
-          <AlertDialogDescription>Die Notiz wird in den Papierkorb verschoben.</AlertDialogDescription>
+          <AlertDialogTitle>Eintrag löschen?</AlertDialogTitle>
+          <AlertDialogDescription>Der Eintrag wird in den Papierkorb verschoben.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Abbrechen</AlertDialogCancel>
           <AlertDialogAction type="button" variant="destructive" onClick={handleDelete} disabled={isPending}>
-            Notiz löschen
+            Eintrag löschen
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
