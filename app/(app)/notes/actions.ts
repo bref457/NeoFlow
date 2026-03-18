@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sendTelegram, sendNotifyEmail } from "@/lib/notify";
 
 export async function createNote(formData: FormData) {
   const supabase = await createClient();
@@ -41,6 +42,19 @@ export async function createNote(formData: FormData) {
   }
 
   revalidatePath("/notes");
+
+  if (category === "feedback") {
+    const fromLine = source ? ` von <b>${source}</b>` : "";
+    const appLine = app_name ? ` (App: ${app_name})` : "";
+    const tgText = `💬 <b>Neues Feedback</b>${fromLine}${appLine}\n\n${content}`;
+    const replyEmail = String(formData.get("reply_email") ?? "").trim() || undefined;
+    void sendTelegram(tgText);
+    void sendNotifyEmail({
+      subject: `Neues Feedback${app_name ? ` – ${app_name}` : ""}`,
+      html: `<p><strong>Von:</strong> ${source ?? "–"}</p><p><strong>App:</strong> ${app_name ?? "–"}</p><hr/><p>${content.replace(/\n/g, "<br/>")}</p>`,
+      replyTo: replyEmail,
+    });
+  }
 }
 
 export async function deleteNote(formData: FormData) {

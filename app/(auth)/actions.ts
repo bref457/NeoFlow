@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendTelegram, sendNotifyEmail } from "@/lib/notify";
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
@@ -23,6 +24,12 @@ export async function signUp(formData: FormData) {
 
   const { error } = await supabase.auth.signUp({ email, password });
   if (error) redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+
+  void sendTelegram(`🆕 <b>Neue Anmeldung</b>\n\n📧 ${email}`);
+  void sendNotifyEmail({
+    subject: "Neue Anmeldung auf NeoFlow",
+    html: `<p>Ein neuer User hat sich registriert:</p><p><strong>${email}</strong></p>`,
+  });
 
   redirect("/login?message=Account erstellt. Falls nötig: E-Mail bestätigen, dann einloggen.");
 }

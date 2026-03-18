@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ARIA",
-  description: "Autonomous Research & Intelligence Agent",
+  title: "NeoFlow",
+  description: "Deine persönliche Kontrollzentrale",
 };
 
 export default function RootLayout({

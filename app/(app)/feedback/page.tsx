@@ -81,6 +81,7 @@ export default async function FeedbackPage({
                 ))}
               </select>
               <Input name="source" placeholder="Von wem? (z.B. Max, Tester 1)" className="sm:flex-1" />
+              <Input name="reply_email" type="email" placeholder="E-Mail (für Antwort, optional)" className="sm:flex-1" />
               <Button type="submit" className="w-full sm:w-auto">
                 Speichern
               </Button>
