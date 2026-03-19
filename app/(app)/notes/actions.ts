@@ -156,6 +156,7 @@ export async function markNoteDone(formData: FormData) {
 
   revalidatePath("/notes");
   revalidatePath("/projects/[id]");
+  revalidatePath("/dashboard");
 }
 
 export async function restoreNote(formData: FormData) {
