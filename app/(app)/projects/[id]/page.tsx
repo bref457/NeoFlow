@@ -168,8 +168,9 @@ export default async function ProjectDetailPage({
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
-  const doneCount = tasks.filter((t) => t.done).length;
-  const openCount = tasks.length - doneCount;
+  const allEntries = [...tasks, ...notes];
+  const doneCount = allEntries.filter((t) => t.done).length;
+  const openCount = allEntries.filter((t) => !t.done).length;
 
   // NeoGarden User-Count
   let neogardenUserCount: number | null = null;
@@ -207,7 +208,7 @@ export default async function ProjectDetailPage({
           </div>
           <p className="text-sm text-muted-foreground">Tasks für dieses Projekt verwalten.</p>
           <p className="text-xs text-muted-foreground">
-            Gesamt: {tasks.length} | Offen: {openCount} | Erledigt: {doneCount}
+            Gesamt: {allEntries.length} | Offen: {openCount} | Erledigt: {doneCount}
           </p>
           {neogardenUserCount !== null && (
             <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
