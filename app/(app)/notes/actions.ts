@@ -155,7 +155,7 @@ export async function markNoteDone(formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath("/notes");
-  revalidatePath("/projects/[id]");
+  revalidatePath("/projects", "layout");
   revalidatePath("/dashboard");
 }
 
