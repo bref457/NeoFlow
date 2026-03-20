@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
   const raw = data?.choices?.[0]?.message?.content ?? "";
 
   try {
-    const parsed = JSON.parse(raw);
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+    const parsed = JSON.parse(cleaned);
     const validCategories = ["task", "feedback", "brainstorming", "infra", "claude", "note"];
     const validProjects = ["NeoFlow", "NeoGarden", "NeoDish", "ARIA", null];
     const validPriorities = ["hoch", "mittel", "niedrig", null];
