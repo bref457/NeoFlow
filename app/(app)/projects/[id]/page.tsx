@@ -377,6 +377,31 @@ export default async function ProjectDetailPage({
                       </div>
                       <p className={`whitespace-pre-wrap break-words ${note.done ? "line-through text-muted-foreground" : ""}`}>{note.content}</p>
                       <p className="text-xs text-muted-foreground">{formatDateTimeEU(note.created_at)}</p>
+                      <details>
+                        <summary className="cursor-pointer text-xs text-muted-foreground">Bearbeiten</summary>
+                        <form action={updateNote} className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                          <input type="hidden" name="noteId" value={note.id} />
+                          <input type="hidden" name="app_name" value={typedProject.name} />
+                          <Input
+                            name="content"
+                            defaultValue={note.content}
+                            required
+                            minLength={1}
+                            maxLength={2000}
+                            className="sm:min-w-64 sm:flex-1"
+                          />
+                          <select
+                            name="category"
+                            defaultValue={note.category ?? "note"}
+                            className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                          >
+                            {Object.entries(NOTE_CATEGORY_LABELS).map(([val, label]) => (
+                              <option key={val} value={val}>{label}</option>
+                            ))}
+                          </select>
+                          <Button type="submit" size="sm" className="sm:w-auto">Speichern</Button>
+                        </form>
+                      </details>
                     </div>
                     <div className="flex items-center gap-2 self-end sm:self-auto">
                       <form action={markNoteDone}>
