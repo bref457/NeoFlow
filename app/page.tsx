@@ -133,8 +133,8 @@ const PROJECT_DETAILS: Record<ProjectKey, {
     icon: <Sprout className="size-5 text-aria" />,
     name: "NeoGarden",
     tagline: "Von der Aussaat bis zur Ernte.",
-    problem: "Du weißt nie mehr was du wann gepflanzt hast, was als nächstes dran ist — und welche Pflanzen eigentlich gut zusammenpassen.",
-    solution: "NeoGarden ist dein digitales Gartenbuch. Du führst ein Anzucht-Tagebuch, planst im Kalender wann gesät oder gepflanzt wird, und ein KI-Assistent beantwortet alle Gartenfragen — von Pflanzabstand bis Schädlingsbekämpfung.",
+    problem: "Was wann gepflanzt? Was kommt als nächstes? Welche Pflanzen passen zusammen? Ohne System geht der Überblick schnell verloren.",
+    solution: "NeoGarden ist dein digitales Gartenbuch: Anzucht-Tagebuch, Pflanzkalender und ein KI-Assistent für alle Gartenfragen — von Pflanzabstand bis Schädlingsbekämpfung. Selbst gehostet, keine Datenweitergabe.",
     features: ["Anzucht-Tagebuch", "Pflanzkalender", "KI-Gartenberatung", "Privat & ohne Datenweitergabe"],
     url: "https://garten.neo457.ch",
     urlLabel: "App öffnen",
@@ -153,8 +153,8 @@ const PROJECT_DETAILS: Record<ProjectKey, {
     icon: <MonitorDot className="size-5 text-aria" />,
     name: "NeoFlow",
     tagline: "Mein persönliches Kontrollzentrum.",
-    problem: "Wer mehrere Web-Apps, einen eigenen Server und viele Projekte betreibt, verliert schnell den Überblick. Was läuft gerade? Was steht an? Wie viel Ressourcen hat der Server noch?",
-    solution: "NeoFlow ist mein persönliches Command Center. Auf einen Blick: alle laufenden Docker Container, Server-Status, Tasks und Notizen für alle Projekte — plus direkter KI-Chat. Von überall erreichbar, komplett selbst gehostet.",
+    problem: "Mehrere Apps, ein eigener Server, viele laufende Projekte — ohne zentralen Überblick geht die Kontrolle schnell verloren.",
+    solution: "NeoFlow ist das persönliche Command Center: Docker-Status, Server-Ressourcen, Tasks, Notizen und KI-Chat — alles auf einem Dashboard. Selbst gehostet, von überall erreichbar.",
     features: ["Mission Control", "Docker & Server Status", "Task- & Notiz-Verwaltung", "ARIA KI-Integration"],
   },
 };
@@ -230,9 +230,9 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-[clamp(2.8rem,7vw,5.5rem)] font-black leading-[1.05] tracking-tight"
               >
-                Ich baue Software{" "}
+                Apps die deinen Alltag{" "}
                 <br className="hidden sm:block" />
-                <span className="gradient-text">die ich selbst nutze.</span>
+                <span className="gradient-text">automatisieren.</span>
               </motion.h1>
 
               <motion.p
@@ -240,8 +240,9 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
               >
-                Ich bin Neo — Solo-Developer aus der Schweiz. Kleine, fokussierte Web-Apps —
-                von der Idee bis zum Deploy auf eigenem Server.
+                Steuerbar per Chat-Bot. Unterstützt durch KI.
+                <br />
+                Solo entwickelt – von der Idee bis zum Deploy auf eigenem Server.
               </motion.p>
 
               <motion.div
@@ -296,8 +297,8 @@ export default function Home() {
                   </div>
                   <p className="font-mono text-[11px] text-aria">Von der Aussaat bis zur Ernte.</p>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
-                    Pflanzkalender, Anzucht-Tagebuch und KI-Gartenberatung.
-                    Alles an einem Ort — persönlich, ohne Datenweitergabe.
+                    Anzucht-Tagebuch, Pflanzkalender und KI-Gartenberatung —
+                    alles selbst gehostet, ohne Datenweitergabe.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {["Next.js", "Supabase", "KI-Chat"].map(t => (
@@ -338,8 +339,8 @@ export default function Home() {
                   </div>
                   <p className="font-mono text-[11px] text-aria">Keine Frage mehr: Was essen wir heute?</p>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
-                    Wochenplaner für Mahlzeiten. Rezepte organisieren,
-                    Wochen vorplanen, Einkaufsliste auf Knopfdruck.
+                    Mahlzeiten für die Woche planen, Rezepte verwalten —
+                    Einkaufsliste entsteht automatisch.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {["Next.js", "Supabase", "Meal Planning"].map(t => (
@@ -382,8 +383,8 @@ export default function Home() {
                   </div>
                   <p className="font-mono text-[11px] text-aria">Mein persönliches Kontrollzentrum.</p>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
-                    Überblick über alle Services, Docker Container, VPS-Ressourcen,
-                    Tasks und Notizen — alles auf einen Blick, von überall erreichbar.
+                    Alle Services, Tasks und Notizen auf einen Blick —
+                    Mission Control für den eigenen Server.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {["Mission Control", "Docker", "Self-hosted"].map(t => (
@@ -409,7 +410,7 @@ export default function Home() {
               viewport={{ once: true }} transition={{ duration: 0.4 }}
               className="flex items-center gap-4 mb-6"
             >
-              <span className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-foreground/60">Wie ich arbeite</span>
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-foreground/60">Mein Setup</span>
               <div className="h-px flex-1 bg-border/40" />
             </motion.div>
 
@@ -417,10 +418,10 @@ export default function Home() {
               <TerminalBlock />
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { icon: Laptop, label: "Laptop", detail: "VS Code + Claude Code", color: "text-aria", glow: "rgba(74,222,128,0.15)", delay: 0 },
-                  { icon: Server, label: "VPS (Hetzner)", detail: "Docker · nginx · 24/7", color: "text-cyan-400", glow: "rgba(34,211,238,0.15)", delay: 1 },
-                  { icon: MessageSquare, label: "Telegram", detail: "ARIA Bot · unterwegs", color: "text-violet-400", glow: "rgba(167,139,250,0.15)", delay: 2 },
-                  { icon: Globe, label: "Remote", detail: "vscode.neo457.ch", color: "text-emerald-400", glow: "rgba(52,211,153,0.15)", delay: 3 },
+                  { icon: Laptop, label: "Laptop", detail: "VS Code · Claude Code CLI", color: "text-aria", glow: "rgba(74,222,128,0.15)", delay: 0 },
+                  { icon: Server, label: "VPS (Hetzner)", detail: "Docker · nginx · 24/7 online", color: "text-cyan-400", glow: "rgba(34,211,238,0.15)", delay: 1 },
+                  { icon: MessageSquare, label: "Chat-Bot", detail: "Messenger-Integration · unterwegs", color: "text-violet-400", glow: "rgba(167,139,250,0.15)", delay: 2 },
+                  { icon: Globe, label: "Remote", detail: "vscode.neo457.ch · überall", color: "text-emerald-400", glow: "rgba(52,211,153,0.15)", delay: 3 },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
