@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import {
   ExternalLink, Sprout, UtensilsCrossed, MonitorDot,
-  Github, Server, Laptop, MessageSquare, Globe, Lock, CheckCircle2,
+  Github, Lock, CheckCircle2,
   ShoppingCart, Wallet,
 } from "lucide-react";
 
@@ -56,61 +56,7 @@ function Sparkles({ count = 8 }: { count?: number }) {
 }
 
 
-// ─── TERMINAL ───────────────────────────────────────────────────────────────
-const terminalSequence = [
-  { prefix: "~", cmd: "ssh root@neo457.ch", type: "cmd" },
-  { prefix: "vps", cmd: "docker ps", type: "cmd" },
-  { prefix: "", cmd: "neodish      ↑ running", type: "out" },
-  { prefix: "", cmd: "neogarden    ↑ running", type: "out" },
-  { prefix: "", cmd: "neolist      ↑ running", type: "out" },
-  { prefix: "", cmd: "neobudget    ↑ running", type: "out" },
-  { prefix: "vps", cmd: "claude  # Mission Control", type: "cmd" },
-  { prefix: "vps", cmd: "git pull && docker compose up -d", type: "cmd" },
-];
-
-function TerminalBlock() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [visible, setVisible] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    let i = 0;
-    const tick = () => { i++; setVisible(i); if (i < terminalSequence.length) setTimeout(tick, 550); };
-    setTimeout(tick, 200);
-  }, [inView]);
-
-  return (
-    <div ref={ref} className="rounded-2xl border border-border/50 bg-[#0a0a0a] overflow-hidden">
-      <div className="flex items-center gap-2 border-b border-border/30 px-4 py-3">
-        <span className="size-3 rounded-full bg-red-500/70" />
-        <span className="size-3 rounded-full bg-yellow-500/70" />
-        <span className="size-3 rounded-full bg-green-500/70" />
-        <span className="ml-3 font-mono text-[11px] text-muted-foreground">neo@vps:~</span>
-      </div>
-      <div className="p-5 font-mono text-[12px] leading-7 space-y-0.5 min-h-[200px]">
-        {terminalSequence.slice(0, visible).map((line, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }} className="flex gap-2">
-            {line.prefix
-              ? <span className="text-aria select-none shrink-0">{line.prefix} $</span>
-              : <span className="text-aria/30 select-none shrink-0 pl-4">→</span>
-            }
-            <span className={line.type === "out" ? "text-muted-foreground" : "text-foreground/85"}>{line.cmd}</span>
-          </motion.div>
-        ))}
-        {visible >= terminalSequence.length && (
-          <div className="flex gap-2">
-            <span className="text-aria select-none">vps $</span>
-            <motion.span animate={{ opacity: [1, 0] }} transition={{ duration: 0.8, repeat: Infinity }} className="text-aria">▋</motion.span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // ─── MAIN ───────────────────────────────────────────────────────────────────
-const stack = ["Next.js", "TypeScript", "Tailwind CSS", "Supabase", "Docker", "nginx", "Hetzner", "Claude Code"];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
@@ -510,76 +456,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* SETUP / TERMINAL */}
-          <section className="pb-16">
-            <motion.div
-              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-              viewport={{ once: true }} transition={{ duration: 0.4 }}
-              className="flex items-center gap-4 mb-6"
-            >
-              <span className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-foreground/60">Mein Setup</span>
-              <div className="h-px flex-1 bg-border/40" />
-            </motion.div>
-
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <TerminalBlock />
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { icon: Laptop, label: "Laptop", detail: "VS Code · Claude Code CLI", color: "text-aria", glow: "rgba(74,222,128,0.15)", delay: 0 },
-                  { icon: Server, label: "VPS (Hetzner)", detail: "Docker · nginx · 24/7 online", color: "text-cyan-400", glow: "rgba(34,211,238,0.15)", delay: 1 },
-                  { icon: MessageSquare, label: "Chat-Bot", detail: "Messenger-Integration · unterwegs", color: "text-violet-400", glow: "rgba(167,139,250,0.15)", delay: 2 },
-                  { icon: Globe, label: "Remote", detail: "vscode.neo457.ch · überall", color: "text-emerald-400", glow: "rgba(52,211,153,0.15)", delay: 3 },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <motion.div
-                      key={item.label}
-                      variants={fadeUp} initial="hidden" whileInView="show" custom={item.delay}
-                      viewport={{ once: true }}
-                      whileHover={{ y: -3, boxShadow: `0 8px 30px ${item.glow}` }}
-                      className="rounded-xl border border-border/50 bg-card/30 p-4 flex flex-col gap-3 hover:border-border/80 transition-colors cursor-default"
-                    >
-                      <div className="flex size-9 items-center justify-center rounded-lg border border-border/60 bg-muted/40">
-                        <Icon className={`size-4 ${item.color}`} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold">{item.label}</p>
-                        <p className="font-mono text-[10px] text-muted-foreground mt-0.5">{item.detail}</p>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* STACK */}
-          <section className="pb-24">
-            <motion.div
-              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-              viewport={{ once: true }} transition={{ duration: 0.4 }}
-              className="flex items-center gap-4 mb-6"
-            >
-              <span className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-foreground/60">Stack</span>
-              <div className="h-px flex-1 bg-border/40" />
-            </motion.div>
-            <motion.div
-              className="flex flex-wrap gap-2"
-              initial="hidden" whileInView="show" viewport={{ once: true }}
-              variants={{ show: { transition: { staggerChildren: 0.06 } } }}
-            >
-              {stack.map((tech) => (
-                <motion.span
-                  key={tech}
-                  variants={{ hidden: { opacity: 0, scale: 0.8 }, show: { opacity: 1, scale: 1 } }}
-                  whileHover={{ y: -2, transition: { duration: 0.15 } }}
-                  className="rounded-lg border border-border/50 bg-muted/20 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:border-aria/30 hover:text-foreground transition-colors cursor-default"
-                >
-                  {tech}
-                </motion.span>
-              ))}
-            </motion.div>
-          </section>
 
         </main>
 
