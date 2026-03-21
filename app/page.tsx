@@ -143,7 +143,7 @@ const PROJECT_DETAILS: Record<ProjectKey, {
     urlLabel: "App öffnen",
   },
   neodish: {
-    icon: <UtensilsCrossed className="size-5 text-aria" />,
+    icon: <UtensilsCrossed className="size-5 text-orange-500" />,
     name: "NeoDish",
     tagline: "Keine Frage mehr: Was essen wir heute?",
     problem: "Jeden Abend die gleiche Frage: 'Was essen wir heute?' Zutaten fehlen, Rezepte sind überall verstreut, der Einkauf wird zum Chaos.",
@@ -340,27 +340,27 @@ export default function Home() {
               {/* NeoDish */}
               <motion.a
                 href="https://essen.neo457.ch" target="_blank" rel="noopener noreferrer"
-                className="group relative rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-aria/30 transition-colors"
+                className="group relative rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-orange-600/30 transition-colors"
                 style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 variants={fadeUp} initial="hidden" whileInView="show" custom={1}
                 viewport={{ once: true }}
                 whileHover={{ y: -3 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-aria/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative flex h-full flex-col gap-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-aria/40 transition-colors">
-                        <UtensilsCrossed className="size-5 text-aria" />
+                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-orange-600/40 transition-colors">
+                        <UtensilsCrossed className="size-5 text-orange-500" />
                       </div>
                       <div>
                         <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">02</p>
                         <h2 className="text-base font-bold">NeoDish</h2>
                       </div>
                     </div>
-                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-aria group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-orange-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
-                  <p className="font-mono text-[11px] text-aria">Keine Frage mehr: Was essen wir heute?</p>
+                  <p className="font-mono text-[11px] text-orange-500">Keine Frage mehr: Was essen wir heute?</p>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
                     Mahlzeiten für die Woche planen, Rezepte verwalten —
                     Einkaufsliste entsteht automatisch.
@@ -372,7 +372,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDialog("neodish"); }}
-                    className="self-start rounded-md border border-aria/20 bg-aria-dim/60 px-3 py-1 font-mono text-[11px] text-aria transition-all hover:border-aria/50 hover:bg-aria/10"
+                    className="self-start rounded-md border border-orange-600/20 bg-orange-600/5 px-3 py-1 font-mono text-[11px] text-orange-500 transition-all hover:border-orange-600/50 hover:bg-orange-600/10"
                   >
                     Mehr erfahren →
                   </button>
