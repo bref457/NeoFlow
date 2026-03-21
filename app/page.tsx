@@ -11,6 +11,7 @@ import {
 import {
   ExternalLink, Sprout, UtensilsCrossed, MonitorDot,
   Github, Server, Laptop, MessageSquare, Globe, Lock, CheckCircle2,
+  ShoppingCart, Wallet,
 } from "lucide-react";
 
 // ─── SPARKLES ───────────────────────────────────────────────────────────────
@@ -61,6 +62,8 @@ const terminalSequence = [
   { prefix: "vps", cmd: "docker ps", type: "cmd" },
   { prefix: "", cmd: "neodish      ↑ running", type: "out" },
   { prefix: "", cmd: "neogarden    ↑ running", type: "out" },
+  { prefix: "", cmd: "neolist      ↑ running", type: "out" },
+  { prefix: "", cmd: "neobudget    ↑ running", type: "out" },
   { prefix: "vps", cmd: "claude  # Mission Control", type: "cmd" },
   { prefix: "vps", cmd: "git pull && docker compose up -d", type: "cmd" },
 ];
@@ -117,7 +120,7 @@ const fadeUp = {
   }),
 };
 
-type ProjectKey = "neogarden" | "neodish" | "neoflow";
+type ProjectKey = "neogarden" | "neodish" | "neoflow" | "neolist" | "neobudget";
 
 const PROJECT_DETAILS: Record<ProjectKey, {
   icon: React.ReactNode;
@@ -156,6 +159,26 @@ const PROJECT_DETAILS: Record<ProjectKey, {
     problem: "Mehrere Apps, ein eigener Server, viele laufende Projekte — ohne zentralen Überblick geht die Kontrolle schnell verloren.",
     solution: "NeoFlow ist das persönliche Command Center: Docker-Status, Server-Ressourcen, Tasks, Notizen und KI-Chat — alles auf einem Dashboard. Selbst gehostet, von überall erreichbar.",
     features: ["Mission Control", "Docker & Server Status", "Task- & Notiz-Verwaltung", "ARIA KI-Integration"],
+  },
+  neolist: {
+    icon: <ShoppingCart className="size-5 text-blue-400" />,
+    name: "NeoList",
+    tagline: "Die smarte Einkaufsliste.",
+    problem: "Einkaufen ohne Liste endet im Chaos — Produkte vergessen, doppelt gekauft, Zettel verloren. Die App öffnen kostet Zeit, die man unterwegs nicht hat.",
+    solution: "NeoList ist die Einkaufsliste, die du nie öffnen musst. Einfach per Sprache oder Text an den Telegram Bot — Produkte landen sofort auf der Liste. Mehrere Produkte auf einmal, Spracherkennung inklusive.",
+    features: ["Telegram Bot Integration", "Spracheingabe via Whisper", "Mehrere Produkte auf einmal", "Self-hosted & privat"],
+    url: "https://list.neo457.ch",
+    urlLabel: "App öffnen",
+  },
+  neobudget: {
+    icon: <Wallet className="size-5 text-emerald-400" />,
+    name: "NeoBudget",
+    tagline: "Ausgaben im Griff.",
+    problem: "Am Monatsende weißt du nie, wohin das Geld geflossen ist. Quittungen verlieren sich, Ausgaben werden vergessen — oft schon Minuten später.",
+    solution: "NeoBudget erfasst Ausgaben sofort, wo du bist — per Sprache oder Text direkt an den Telegram Bot. Tag, Woche und Monat im Überblick. Kein Aufwand, kein Vergessen.",
+    features: ["Telegram Bot Integration", "Spracheingabe via Whisper", "Statistiken nach Tag/Woche/Monat", "Kategorie-Verwaltung"],
+    url: "https://budget.neo457.ch",
+    urlLabel: "App öffnen",
   },
 };
 
@@ -399,6 +422,90 @@ export default function Home() {
                   </button>
                 </div>
               </motion.div>
+
+              {/* NeoList */}
+              <motion.a
+                href="https://list.neo457.ch" target="_blank" rel="noopener noreferrer"
+                className="group relative rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-blue-400/30 transition-colors"
+                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
+                variants={fadeUp} initial="hidden" whileInView="show" custom={3}
+                viewport={{ once: true }}
+                whileHover={{ y: -3 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative flex h-full flex-col gap-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-blue-400/40 transition-colors">
+                        <ShoppingCart className="size-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">04</p>
+                        <h2 className="text-base font-bold">NeoList</h2>
+                      </div>
+                    </div>
+                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <p className="font-mono text-[11px] text-blue-400">Die smarte Einkaufsliste.</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground flex-1">
+                    Produkte per Sprache oder Text an den Bot —
+                    landen sofort auf der Liste. Kein App-Öffnen nötig.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Next.js", "Supabase", "Telegram Bot"].map(t => (
+                      <span key={t} className="rounded-md border border-border/50 bg-muted/30 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">{t}</span>
+                    ))}
+                  </div>
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDialog("neolist"); }}
+                    className="self-start rounded-md border border-blue-400/20 bg-blue-400/5 px-3 py-1 font-mono text-[11px] text-blue-400 transition-all hover:border-blue-400/50 hover:bg-blue-400/10"
+                  >
+                    Mehr erfahren →
+                  </button>
+                </div>
+              </motion.a>
+
+              {/* NeoBudget */}
+              <motion.a
+                href="https://budget.neo457.ch" target="_blank" rel="noopener noreferrer"
+                className="group relative rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur overflow-hidden hover:border-emerald-400/30 transition-colors"
+                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
+                variants={fadeUp} initial="hidden" whileInView="show" custom={4}
+                viewport={{ once: true }}
+                whileHover={{ y: -3 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative flex h-full flex-col gap-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-11 items-center justify-center rounded-xl border border-border/60 bg-muted/40 group-hover:border-emerald-400/40 transition-colors">
+                        <Wallet className="size-5 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">05</p>
+                        <h2 className="text-base font-bold">NeoBudget</h2>
+                      </div>
+                    </div>
+                    <ExternalLink className="size-3.5 text-muted-foreground/30 transition-all group-hover:text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <p className="font-mono text-[11px] text-emerald-400">Ausgaben im Griff.</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground flex-1">
+                    Ausgaben sofort per Sprache oder Text erfassen —
+                    Tag, Woche und Monat auf einen Blick.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Next.js", "Supabase", "Telegram Bot"].map(t => (
+                      <span key={t} className="rounded-md border border-border/50 bg-muted/30 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">{t}</span>
+                    ))}
+                  </div>
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDialog("neobudget"); }}
+                    className="self-start rounded-md border border-emerald-400/20 bg-emerald-400/5 px-3 py-1 font-mono text-[11px] text-emerald-400 transition-all hover:border-emerald-400/50 hover:bg-emerald-400/10"
+                  >
+                    Mehr erfahren →
+                  </button>
+                </div>
+              </motion.a>
 
             </div>
           </section>
