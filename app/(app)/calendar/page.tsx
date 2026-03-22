@@ -320,7 +320,7 @@ export default async function CalendarPage({
               <select
                 name="app_name"
                 defaultValue=""
-                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                className="h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               >
                 <option value="">Kein Projekt</option>
                 {typedProjects.map((p) => (
@@ -330,7 +330,7 @@ export default async function CalendarPage({
               <select
                 name="recurrenceRule"
                 defaultValue="none"
-                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                className="h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               >
                 {CALENDAR_RECURRENCE_RULES.map((rule) => (
                   <option key={rule} value={rule}>
@@ -407,7 +407,7 @@ export default async function CalendarPage({
                     <select
                       name="app_name"
                       defaultValue={entry.app_name ?? ""}
-                      className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                      className="h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                     >
                       <option value="">Kein Projekt</option>
                       {typedProjects.map((p) => (
@@ -417,7 +417,7 @@ export default async function CalendarPage({
                     <select
                       name="recurrenceRule"
                       defaultValue={entry.recurrence_rule}
-                      className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                      className="h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                     >
                       {CALENDAR_RECURRENCE_RULES.map((rule) => (
                         <option key={rule} value={rule}>

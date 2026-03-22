@@ -74,7 +74,7 @@ export default async function FeedbackPage({
               <select
                 name="app_name"
                 defaultValue="gartenplaner"
-                className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="flex h-9 rounded-md border border-input bg-transparent text-foreground px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 {APP_OPTIONS.map((app) => (
                   <option key={app} value={app}>{app.charAt(0).toUpperCase() + app.slice(1)}</option>

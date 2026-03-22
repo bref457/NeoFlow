@@ -251,7 +251,7 @@ export default async function ProjectDetailPage({
             <select
               name="status"
               defaultValue={statusFilter}
-              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              className="h-9 rounded-md border border-input bg-transparent text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
             >
               <option value="all">Alle</option>
               <option value="open">Offen</option>
@@ -260,7 +260,7 @@ export default async function ProjectDetailPage({
             <select
               name="priority"
               defaultValue={priorityFilter}
-              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              className="h-9 rounded-md border border-input bg-transparent text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
             >
               <option value="all">Alle Prioritäten</option>
               <option value="hoch">Hoch</option>
@@ -318,7 +318,7 @@ export default async function ProjectDetailPage({
                         <select
                           name="priority"
                           defaultValue={task.priority ?? "mittel"}
-                          className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                          className="h-9 rounded-md border border-input bg-transparent text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                         >
                           <option value="hoch">Hoch</option>
                           <option value="mittel">Mittel</option>
@@ -393,7 +393,7 @@ export default async function ProjectDetailPage({
                           <select
                             name="category"
                             defaultValue={note.category ?? "note"}
-                            className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                            className="h-9 rounded-md border border-input bg-transparent text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                           >
                             {Object.entries(NOTE_CATEGORY_LABELS).map(([val, label]) => (
                               <option key={val} value={val}>{label}</option>

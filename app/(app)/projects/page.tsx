@@ -137,7 +137,7 @@ export default async function ProjectsPage({
             <select
               name="color"
               defaultValue={colorFilter}
-              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              className="h-9 rounded-md border border-input bg-transparent text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
             >
               <option value="">Alle Farben</option>
               {PROJECT_PASTEL_COLORS.map((color) => (
@@ -190,7 +190,7 @@ export default async function ProjectsPage({
                         <select
                           name="color"
                           defaultValue={projectColor}
-                          className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                          className="h-9 rounded-md border border-input bg-transparent text-foreground px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                         >
                           {PROJECT_PASTEL_COLORS.map((color) => (
                             <option key={color} value={color}>

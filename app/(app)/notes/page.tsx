@@ -117,7 +117,7 @@ export default async function NotesPage({
             <select
               name="category"
               defaultValue={filterCategory}
-              className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex h-9 rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">Alle Kategorien</option>
               {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
@@ -127,7 +127,7 @@ export default async function NotesPage({
             <select
               name="app"
               defaultValue={filterApp}
-              className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex h-9 rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">Alle Projekte</option>
               {(projects ?? []).map((p) => (
@@ -137,7 +137,7 @@ export default async function NotesPage({
             <select
               name="done"
               defaultValue={showDone ? "1" : "0"}
-              className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex h-9 rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="0">Offen</option>
               <option value="1">Erledigt</option>
@@ -199,7 +199,7 @@ export default async function NotesPage({
                           <select
                             name="category"
                             defaultValue={note.category ?? "note"}
-                            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
+                            className="flex h-9 rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm"
                           >
                             {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
                               <option key={val} value={val}>{label}</option>
@@ -208,7 +208,7 @@ export default async function NotesPage({
                           <select
                             name="app_name"
                             defaultValue={note.app_name ?? ""}
-                            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
+                            className="flex h-9 rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm"
                           >
                             <option value="">Kein Projekt</option>
                             {(projects ?? []).map((p) => (
